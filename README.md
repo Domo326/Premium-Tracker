@@ -2,7 +2,7 @@
 
 > A mobile-first giveaway inventory tracker for tour managers. Track what you start with, what came in, what's left — and let the app do the math. 📦✨
 
-🌐 **Live app:** _[Add your Vercel URL here once deployed]_
+🌐 **Live app:** [premium-tracker.vercel.app](https://premium-tracker.vercel.app)
 
 ---
 
