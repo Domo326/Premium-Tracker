@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Premium Tracker</title>
+  <meta name="description" content="Track giveaway inventory and tour days for any brand activation." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Premium" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    html, body, #root { height: 100%; }
+    body { margin: 0; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+    .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.02em; }
+    .font-body { font-family: 'Outfit', system-ui, sans-serif; }
+    .font-data { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); }}
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+
+    .theme-light {
+      --app-bg: #f5f5f4; --surface: #ffffff; --surface-2: #fafaf9;
+      --border: #e7e5e4; --border-soft: #f5f5f4;
+      --text-1: #1c1917; --text-2: #44403c; --text-3: #78716c; --text-4: #a8a29e; --text-5: #d6d3d1;
+      --accent-solid: #84cc16; --accent-solid-fg: #ffffff; --accent-text: #4d7c0f;
+      --accent-soft-bg: #ecfccb; --accent-soft-fg: #3f6212;
+      --amber-text: #b45309; --amber-soft-bg: #fffbeb; --amber-soft-fg: #b45309;
+      --amber-strong-bg: #fef3c7; --amber-strong-fg: #92400e;
+      --inverse-bg: #1c1917; --inverse-fg: #ffffff; --inverse-2: #44403c;
+      --danger-soft-bg: #fef2f2; --danger-border: #fecaca; --danger-text: #b91c1c; --danger-btn-bg: #ef4444;
+      --status-closed-bg: #f5f5f4; --status-closed-fg: #78716c;
+      --input-bg: #fafaf9; --input-bg-2: #ffffff; --modal-overlay: rgba(0,0,0,0.4);
+      --gradient-1: #ecfccb; --gradient-2: #fef3c7;
+    }
+    .theme-dark {
+      --app-bg: #0a0a0a; --surface: #171717; --surface-2: #0f0f0f;
+      --border: #262626; --border-soft: #1f1f1f;
+      --text-1: #fafafa; --text-2: #d4d4d4; --text-3: #a3a3a3; --text-4: #737373; --text-5: #404040;
+      --accent-solid: #a3e635; --accent-solid-fg: #0a0a0a; --accent-text: #a3e635;
+      --accent-soft-bg: rgba(132, 204, 22, 0.18); --accent-soft-fg: #a3e635;
+      --amber-text: #fcd34d; --amber-soft-bg: rgba(251, 191, 36, 0.1); --amber-soft-fg: #fcd34d;
+      --amber-strong-bg: rgba(251, 191, 36, 0.18); --amber-strong-fg: #fcd34d;
+      --inverse-bg: #fafafa; --inverse-fg: #0a0a0a; --inverse-2: #1f1f1f;
+      --danger-soft-bg: rgba(239, 68, 68, 0.1); --danger-border: rgba(239, 68, 68, 0.35); --danger-text: #fca5a5; --danger-btn-bg: #ef4444;
+      --status-closed-bg: #262626; --status-closed-fg: #a3a3a3;
+      --input-bg: #0f0f0f; --input-bg-2: #171717; --modal-overlay: rgba(0,0,0,0.7);
+      --gradient-1: #1a2e0a; --gradient-2: #2e1f0a;
+    }
+    .theme-ocean {
+      --app-bg: #0c4a6e; --surface: #082f3d; --surface-2: #061e29;
+      --border: #1e4a59; --border-soft: #163945;
+      --text-1: #f0fdfa; --text-2: #ccfbf1; --text-3: #99f6e4; --text-4: #5eead4; --text-5: #2dd4bf;
+      --accent-solid: #06b6d4; --accent-solid-fg: #042f2e; --accent-text: #67e8f9;
+      --accent-soft-bg: rgba(34, 211, 238, 0.2); --accent-soft-fg: #a5f3fc;
+      --amber-text: #fde047; --amber-soft-bg: rgba(252, 211, 77, 0.12); --amber-soft-fg: #fde047;
+      --amber-strong-bg: rgba(252, 211, 77, 0.22); --amber-strong-fg: #fef08a;
+      --inverse-bg: #f0fdfa; --inverse-fg: #042f2e; --inverse-2: #134e4a;
+      --danger-soft-bg: rgba(239, 68, 68, 0.15); --danger-border: rgba(252, 165, 165, 0.4); --danger-text: #fca5a5; --danger-btn-bg: #ef4444;
+      --status-closed-bg: rgba(94, 234, 212, 0.15); --status-closed-fg: #99f6e4;
+      --input-bg: #061e29; --input-bg-2: #082f3d; --modal-overlay: rgba(2,20,30,0.8);
+      --gradient-1: #155e75; --gradient-2: #0e7490;
+    }
+    .theme-ocean .bg-app {
+      background: linear-gradient(135deg, #0c4a6e 0%, #155e75 50%, #134e4a 100%);
+    }
+
+    .bg-app { background-color: var(--app-bg); }
+    .bg-surface { background-color: var(--surface); }
+    .bg-surface-2 { background-color: var(--surface-2); }
+    .border-line { border-color: var(--border); }
+    .border-line-soft { border-color: var(--border-soft); }
+    .divide-line > * + * { border-top-color: var(--border-soft); border-top-width: 1px; }
+    .text-1 { color: var(--text-1); } .text-2 { color: var(--text-2); } .text-3 { color: var(--text-3); } .text-4 { color: var(--text-4); } .text-5 { color: var(--text-5); }
+    .bg-accent { background-color: var(--accent-solid); color: var(--accent-solid-fg); }
+    .text-accent { color: var(--accent-text); }
+    .bg-accent-soft { background-color: var(--accent-soft-bg); color: var(--accent-soft-fg); }
+    .text-amber { color: var(--amber-text); }
+    .bg-amber-soft { background-color: var(--amber-soft-bg); color: var(--amber-soft-fg); }
+    .bg-amber-strong { background-color: var(--amber-strong-bg); color: var(--amber-strong-fg); }
+    .bg-inverse { background-color: var(--inverse-bg); color: var(--inverse-fg); }
+    .bg-inverse-2 { background-color: var(--inverse-2); color: var(--inverse-fg); }
+    .bg-danger-soft { background-color: var(--danger-soft-bg); }
+    .border-danger { border-color: var(--danger-border); }
+    .text-danger { color: var(--danger-text); }
+    .bg-danger { background-color: var(--danger-btn-bg); color: #ffffff; }
+    .bg-status-closed { background-color: var(--status-closed-bg); color: var(--status-closed-fg); }
+    .input { background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-1); }
+    .input:focus { border-color: var(--text-4); outline: none; }
+    .input-2 { background-color: var(--input-bg-2); border: 1px solid var(--border); color: var(--text-1); }
+    .input-2:focus { border-color: var(--text-4); outline: none; }
+    .focus-accent:focus { background-color: var(--accent-soft-bg); }
+    .modal-overlay { background-color: var(--modal-overlay); }
+    .placeholder-mute::placeholder { color: var(--text-4); }
+    .summary-gradient { background: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 100%); }
+  </style>
+</head>
+<body class="bg-app">
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, createContext, useContext, useRef } = React;
+
+    // === ICONS ===
+    const Svg = ({ children, className = "w-4 h-4", strokeWidth = 2 }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+    );
+    const Plus = (p) => <Svg {...p}><path d="M5 12h14"/><path d="M12 5v14"/></Svg>;
+    const X = (p) => <Svg {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Svg>;
+    const Check = (p) => <Svg {...p}><path d="M20 6 9 17l-5-5"/></Svg>;
+    const ChevronLeft = (p) => <Svg {...p}><path d="m15 18-6-6 6-6"/></Svg>;
+    const ChevronRight = (p) => <Svg {...p}><path d="m9 18 6-6-6-6"/></Svg>;
+    const Lock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></Svg>;
+    const Unlock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></Svg>;
+    const Download = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Svg>;
+    const Copy = (p) => <Svg {...p}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></Svg>;
+    const Trash2 = (p) => <Svg {...p}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></Svg>;
+    const Clock = (p) => <Svg {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></Svg>;
+    const FileText = (p) => <Svg {...p}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><polyline points="14 2 14 8 20 8"/></Svg>;
+    const Settings = (p) => <Svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></Svg>;
+    const Sun = (p) => <Svg {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></Svg>;
+    const Moon = (p) => <Svg {...p}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></Svg>;
+    const Wave = (p) => <Svg {...p}><path d="M2 6c.6-.5 1.2-1 2.5-1 2.5 0 2.5 2 5 2 2.6 0 2.4-2 5-2 2.5 0 2.5 2 5 2 1.3 0 1.9-.5 2.5-1"/><path d="M2 12c.6-.5 1.2-1 2.5-1 2.5 0 2.5 2 5 2 2.6 0 2.4-2 5-2 2.5 0 2.5 2 5 2 1.3 0 1.9-.5 2.5-1"/><path d="M2 18c.6-.5 1.2-1 2.5-1 2.5 0 2.5 2 5 2 2.6 0 2.4-2 5-2 2.5 0 2.5 2 5 2 1.3 0 1.9-.5 2.5-1"/></Svg>;
+    const Info = (p) => <Svg {...p}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></Svg>;
+    const Edit3 = (p) => <Svg {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></Svg>;
+    const MapPin = (p) => <Svg {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Svg>;
+    const ImageIcon = (p) => <Svg {...p}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></Svg>;
+
+    // === CONSTANTS ===
+    const DEFAULT_ITEMS = [
+      { name: 'T-Shirts', emoji: '👕' },
+      { name: 'Bags', emoji: '🛍️' }
+    ];
+    const BMC_URL = 'https://buymeacoffee.com/Domo326';
+    const CONGRATS = [
+      "🎉 Great job out there! Safe travels on your next adventure!",
+      "🌟 What a tour! You crushed it. Onwards to the next one!",
+      "🚀 Look at those numbers! Take a breather, you earned it.",
+      "👏 Tour complete! May your next one be even better.",
+      "🏆 Champion behavior. Have fun on the road ahead!"
+    ];
+
+    function getFunFact(stats) {
+      const facts = [];
+      const total = stats.totalGivenOut;
+      const days = stats.days;
+      const cities = stats.cities;
+      const events = stats.events;
+
+      if (total > 0) {
+        facts.push(`📦 If each item weighed 1 lb, you moved ${total.toLocaleString()} lbs of swag — about the weight of ${Math.max(1, Math.round(total/180)).toLocaleString()} grown adults.`);
+        facts.push(`🎁 You handed out more freebies than your average Black Friday Best Buy line.`);
+        facts.push(`🤯 ${total.toLocaleString()} items! At 5 seconds each, that's ${Math.round(total*5/3600).toLocaleString()}+ hours of pure giveaway energy.`);
+        facts.push(`🛒 Enough swag to fill ~${Math.max(1, Math.round(total/200)).toLocaleString()} shopping carts. The Costco moms would be jealous.`);
+        if (days > 0) facts.push(`⚡ That's ~${Math.round(total/days).toLocaleString()} items per day. Santa Claus is taking notes.`);
+        const pallets = Math.max(1, Math.round(total/500));
+        facts.push(`🚚 Stacked on pallets, that's roughly ${pallets} pallet${pallets !== 1 ? 's' : ''} of stuff. Your truck earned its rent.`);
+        facts.push(`🌮 ${total.toLocaleString()} items is about the same as how many tacos a small town eats in a week. Just saying.`);
+      }
+      if (cities > 1) {
+        facts.push(`🗺️ ${cities} cities visited — you're basically a rock band at this point. 🎸`);
+        facts.push(`✈️ ${cities} cities! That's more places than the average American visits in an entire year.`);
+        facts.push(`🚗 An average person would need a serious road trip to hit all ${cities} of these cities. You did it for work.`);
+        facts.push(`📍 ${cities} cities means ${cities} different "where's the nearest Chipotle?" moments. We salute you.`);
+      }
+      if (events > 2) {
+        facts.push(`📁 ${events} events. Each one had its own vibe and you handled them all. Pro move. 🏅`);
+      }
+      if (days > 7) {
+        facts.push(`📅 ${days} days on the road — that's ${Math.round(days/7)} weekends sacrificed for the tour. 🫡`);
+        facts.push(`☕ ${days} working days = roughly ${days*2} coffees consumed. You're personally funding a barista's vacation.`);
+        facts.push(`🛏️ ${days} hotel nights of "why is the WiFi password 'welcome' but also nothing works?"`);
+        facts.push(`📶 ${days} days of testing every gas station's bathroom on the way. Heroic, honestly.`);
+      }
+      facts.push(`🎯 Mission accomplished. The brand should send you a thank-you card.`);
+      facts.push(`🏅 Tour managers are the unsung heroes of marketing. This one's for you.`);
+      facts.push(`🚌 Your truck has stories now. Don't let it forget you.`);
+      facts.push(`🎬 That's a wrap. Hollywood-level execution.`);
+      facts.push(`🔥 You're the reason this whole marketing budget actually did something cool.`);
+
+      return facts[Math.floor(Math.random() * facts.length)];
+    }
+
+    // Smart emoji matching
+    const EMOJI_MAP = {
+      bag: '🛍️', bags: '🛍️', tote: '🛍️', totes: '🛍️',
+      bottle: '💧', bottles: '💧', water: '💧',
+      fan: '🪭', fans: '🪭',
+      shirt: '👕', shirts: '👕', tshirt: '👕', tshirts: '👕', 't-shirt': '👕', 't-shirts': '👕', tee: '👕', tees: '👕',
+      hat: '🎩', hats: '🎩', cap: '🧢', caps: '🧢',
+      sticker: '🏷️', stickers: '🏷️',
+      sample: '📦', samples: '📦',
+      pen: '🖊️', pens: '🖊️',
+      keychain: '🔑', keychains: '🔑',
+      lanyard: '🪢', lanyards: '🪢',
+      'cooling towel': '❄️', 'cooling towels': '❄️', towel: '🧻', towels: '🧻',
+      funko: '🎎', 'funko pop': '🎎', 'funko pops': '🎎',
+      koozie: '🥤', koozies: '🥤', cup: '🥤', cups: '🥤', mug: '☕', mugs: '☕',
+      poster: '🖼️', posters: '🖼️',
+      flag: '🚩', flags: '🚩',
+      bracelet: '📿', bracelets: '📿', wristband: '⌚', wristbands: '⌚',
+      backpack: '🎒', backpacks: '🎒',
+      notebook: '📓', notebooks: '📓',
+      button: '🔘', buttons: '🔘', pin: '📌', pins: '📌',
+      snack: '🍿', snacks: '🍿', candy: '🍬',
+      card: '🃏', cards: '🃏',
+      ball: '⚽', balls: '⚽',
+      toy: '🧸', toys: '🧸',
+      phone: '📱', tablet: '📱', tablets: '📱',
+      magnet: '🧲', magnets: '🧲',
+      hoodie: '🧥', hoodies: '🧥',
+      sock: '🧦', socks: '🧦',
+      umbrella: '☂️', sunglasses: '🕶️',
+      charger: '🔌', chargers: '🔌', cable: '🔌', cables: '🔌'
+    };
+    function smartEmoji(name) {
+      if (!name) return '📦';
+      const lower = name.toLowerCase().trim();
+      if (EMOJI_MAP[lower]) return EMOJI_MAP[lower];
+      for (const [key, emoji] of Object.entries(EMOJI_MAP)) {
+        if (lower.includes(key)) return emoji;
+      }
+      return '📦';
+    }
+
+    // === HELPERS ===
+    const todayISO = () => new Date().toISOString().slice(0, 10);
+    const timeShort = (iso) => { try { return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch { return ''; }};
+    const dateNice = (iso) => { try { return new Date(iso + 'T12:00:00').toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }); } catch { return iso; }};
+    const dateShort = (iso) => { try { return new Date(iso + 'T12:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' }); } catch { return iso; }};
+    const monthYearShort = (iso) => {
+      if (!iso || typeof iso !== 'string') return null;
+      try {
+        const [y, m] = iso.split('-');
+        if (!y || !m) return null;
+        const d = new Date(parseInt(y), parseInt(m) - 1, 1);
+        if (isNaN(d.getTime())) return null;
+        return `${d.toLocaleDateString([], { month: 'short' })}/${y.slice(2)}`;
+      } catch { return null; }
+    };
+    const newId = (p='d') => `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+
+    async function sget(key, fb) { try { const v = localStorage.getItem('tracker:' + key); if (v === null) return fb; return JSON.parse(v); } catch { return fb; }}
+    async function sset(key, v) { try { localStorage.setItem('tracker:' + key, JSON.stringify(v)); } catch (e) { console.error(e); }}
+    async function sdel(key) { try { localStorage.removeItem('tracker:' + key); } catch {} }
+
+    function findItem(library, name) { return library.find(i => i.name === name); }
+    function getEmoji(library, name) { return findItem(library, name)?.emoji || smartEmoji(name); }
+
+    // === MIGRATION ===
+    async function migrate() {
+      // 1. Items library: string[] -> {name, emoji}[] (legacy safety)
+      const items = await sget('items', null);
+      if (items && items.length > 0 && typeof items[0] === 'string') {
+        const upgraded = items.map(name => ({ name, emoji: smartEmoji(name) }));
+        await sset('items', upgraded);
+      }
+      // 2. Ensure events array exists
+      const events = await sget('events', null);
+      if (!events) {
+        await sset('events', []);
+      }
+    }
+
+    // === THEME CTX ===
+    const ThemeCtx = createContext({ theme: 'dark', toggle: () => {} });
+    const useTheme = () => useContext(ThemeCtx);
+    function ThemeToggle() {
+      const { theme, toggle } = useTheme();
+      // Show icon of NEXT theme. Cycle: light → dark → ocean → light
+      let icon, label;
+      if (theme === 'light') { icon = <Moon className="w-4 h-4 text-3" />; label = 'Switch to dark'; }
+      else if (theme === 'dark') { icon = <Wave className="w-4 h-4 text-3" />; label = 'Switch to ocean'; }
+      else { icon = <Sun className="w-4 h-4 text-3" />; label = 'Switch to light'; }
+      return (
+        <button onClick={toggle} className="p-2 rounded-lg bg-surface border border-line active:scale-95" aria-label={label}>
+          {icon}
+        </button>
+      );
+    }
+    function InfoButton({ onClick }) {
+      return (
+        <button onClick={onClick} className="p-2 rounded-lg bg-surface border border-line active:scale-95" aria-label="Info">
+          <Info className="w-4 h-4 text-3" />
+        </button>
+      );
+    }
+
+    // === APP ===
+    function App() {
+      const [screen, setScreen] = useState('home');
+      const [currentEventId, setCurrentEventId] = useState(null);
+      const [currentDayId, setCurrentDayId] = useState(null);
+      const [events, setEvents] = useState([]);
+      const [daysIndex, setDaysIndex] = useState([]);
+      const [currentDay, setCurrentDay] = useState(null);
+      const [itemsLibrary, setItemsLibrary] = useState([]);
+      const [theme, setTheme] = useState('dark');
+      const [showWelcome, setShowWelcome] = useState(false);
+      const [showInfo, setShowInfo] = useState(false);
+      const [loading, setLoading] = useState(true);
+      const [toast, setToast] = useState(null);
+
+      useEffect(() => { (async () => {
+        await migrate();
+        let items = await sget('items', null);
+        if (!items) { items = DEFAULT_ITEMS; await sset('items', items); }
+        setItemsLibrary(items);
+        const ev = await sget('events', []);
+        const idx = await sget('idx', []);
+        setEvents(ev);
+        setDaysIndex(idx);
+        const savedTheme = await sget('theme', 'dark');
+        setTheme(savedTheme);
+        const w = await sget('welcomed', null);
+        // Existing users: mark as welcomed silently. New users: show welcome.
+        if (w === null) {
+          if (ev.length > 0 || idx.length > 0) {
+            await sset('welcomed', true);
+          } else {
+            setShowWelcome(true);
+          }
+        }
+        setLoading(false);
+      })(); }, []);
+
+      const toggleTheme = async () => {
+        const order = ['light', 'dark', 'ocean'];
+        const next = order[(order.indexOf(theme) + 1) % order.length];
+        setTheme(next);
+        await sset('theme', next);
+      };
+
+      const showToast = (m) => { setToast(m); setTimeout(() => setToast(null), 2000); };
+
+      const createEvent = async (name, city, monthYear) => {
+        const ev = { id: newId('e'), name: name.trim() || 'Untitled', city: city?.trim() || null, monthYear: monthYear || null, createdAt: new Date().toISOString() };
+        const next = [ev, ...events];
+        setEvents(next);
+        await sset('events', next);
+        setCurrentEventId(ev.id);
+        setScreen('event');
+        showToast(`📁 ${ev.name} created`);
+      };
+      const renameEvent = async (id, name, city, monthYear) => {
+        const next = events.map(e => e.id === id ? { ...e, name: name.trim() || e.name, city: city?.trim() || null, monthYear: monthYear || null } : e);
+        setEvents(next);
+        await sset('events', next);
+        const ev = next.find(e => e.id === id);
+        const newIdx = daysIndex.map(d => d.eventId === id ? { ...d, eventName: ev.name } : d);
+        setDaysIndex(newIdx);
+        await sset('idx', newIdx);
+      };
+      const deleteEvent = async (id) => {
+        const daysToDelete = daysIndex.filter(d => d.eventId === id);
+        for (const d of daysToDelete) await sdel(`d:${d.id}`);
+        const newIdx = daysIndex.filter(d => d.eventId !== id);
+        const next = events.filter(e => e.id !== id);
+        setEvents(next); setDaysIndex(newIdx);
+        await sset('events', next);
+        await sset('idx', newIdx);
+        setScreen('home');
+        setCurrentEventId(null);
+        showToast('🗑️ Event deleted');
+      };
+      const openEvent = (id) => { setCurrentEventId(id); setScreen('event'); };
+
+      const openDay = async (id) => {
+        const d = await sget(`d:${id}`, null);
+        if (d) { setCurrentDay(d); setCurrentDayId(id); setScreen('day'); }
+      };
+
+      const createDay = async (eventId) => {
+        const ev = events.find(e => e.id === eventId);
+        const eventDays = daysIndex.filter(d => d.eventId === eventId);
+        const lastInEvent = eventDays[0];
+        const id = newId('d');
+        const startingItems = lastInEvent
+          ? (lastInEvent.activeItems || itemsLibrary.slice(0, 2).map(i => i.name))
+          : itemsLibrary.slice(0, 2).map(i => i.name);
+        const day = {
+          id, eventId,
+          eventName: ev?.name || '',
+          weekNum: lastInEvent?.weekNum || 1,
+          dayNum: lastInEvent ? lastInEvent.dayNum + 1 : 1,
+          date: todayISO(),
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          closedAt: null,
+          activeItems: startingItems,
+          inventory: {}
+        };
+        day.activeItems.forEach(n => { day.inventory[n] = { starting: 0, restocks: [], leftover: null }; });
+        await sset(`d:${id}`, day);
+        const idxEntry = { id, eventId, eventName: day.eventName, weekNum: day.weekNum, dayNum: day.dayNum, date: day.date, status: 'active', dayTotal: 0, activeItems: day.activeItems };
+        const newIdx = [idxEntry, ...daysIndex];
+        await sset('idx', newIdx);
+        setDaysIndex(newIdx); setCurrentDay(day); setCurrentDayId(id); setScreen('day');
+      };
+
+      const saveDay = async (updated) => {
+        setCurrentDay(updated);
+        await sset(`d:${updated.id}`, updated);
+        const dayTotal = Object.values(updated.inventory).reduce((s, v) => {
+          const start = (v.starting || 0) + (v.restocks || []).reduce((a,r) => a + (r.amount||0), 0);
+          if (v.leftover === null || v.leftover === undefined) return s;
+          return s + Math.max(0, start - v.leftover);
+        }, 0);
+        const newIdx = daysIndex.map(d => d.id === updated.id
+          ? { ...d, eventId: updated.eventId, eventName: updated.eventName, weekNum: updated.weekNum, dayNum: updated.dayNum, date: updated.date, status: updated.status, dayTotal, activeItems: updated.activeItems }
+          : d);
+        await sset('idx', newIdx);
+        setDaysIndex(newIdx);
+      };
+
+      const deleteDay = async (id) => {
+        await sdel(`d:${id}`);
+        const newIdx = daysIndex.filter(d => d.id !== id);
+        await sset('idx', newIdx);
+        setDaysIndex(newIdx);
+        if (currentDayId === id) {
+          setCurrentDay(null); setCurrentDayId(null);
+          setScreen(currentEventId ? 'event' : 'home');
+        }
+        showToast('🗑️ Day deleted');
+      };
+
+      const updateLibrary = async (next) => { setItemsLibrary(next); await sset('items', next); };
+
+      const startNewTour = async () => {
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:') && (k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx'));
+        keys.forEach(k => localStorage.removeItem(k));
+        setEvents([]); setDaysIndex([]); setCurrentDay(null); setCurrentDayId(null); setCurrentEventId(null);
+        await sset('items', DEFAULT_ITEMS);
+        setItemsLibrary(DEFAULT_ITEMS);
+        setScreen('home');
+        showToast('🧹 Fresh start — good luck!');
+      };
+
+      const dismissWelcome = async (dontShow) => {
+        setShowWelcome(false);
+        if (dontShow) { await sset('welcomed', true); }
+      };
+
+      if (loading) {
+        return (
+          <div className={`theme-${theme} min-h-screen w-full flex items-center justify-center bg-app`}>
+            <div className="text-3 font-data text-xs tracking-widest uppercase">Loading</div>
+          </div>
+        );
+      }
+
+      const currentEvent = events.find(e => e.id === currentEventId);
+      const eventDays = daysIndex.filter(d => d.eventId === currentEventId);
+
+      return (
+        <ThemeCtx.Provider value={{ theme, toggle: toggleTheme }}>
+          <div className={`theme-${theme} min-h-screen w-full bg-app text-1 font-body`}>
+            {screen === 'home' && (
+              <Home events={events} daysIndex={daysIndex} onOpenEvent={openEvent} onCreateEvent={createEvent} onLibrary={() => setScreen('library')} onInfo={() => setShowInfo(true)} onDeleteEvent={deleteEvent} onRenameEvent={renameEvent} />
+            )}
+            {screen === 'event' && currentEvent && (
+              <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
+            )}
+            {screen === 'day' && currentDay && (
+              <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} showToast={showToast} />
+            )}
+            {screen === 'library' && (
+              <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} />
+            )}
+            {screen === 'summary' && (
+              <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
+            )}
+            {screen === 'export' && currentDay && (
+              <ExportView day={currentDay} itemsLibrary={itemsLibrary} onBack={() => setScreen('day')} onInfo={() => setShowInfo(true)} showToast={showToast} />
+            )}
+
+            {showWelcome && <InfoModal first onClose={dismissWelcome} />}
+            {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-3.5 py-2 bg-inverse rounded-full text-xs font-semibold shadow-lg z-50">
+                {toast}
+              </div>
+            )}
+          </div>
+        </ThemeCtx.Provider>
+      );
+    }
+
+    // === INFO MODAL ===
+    function InfoModal({ first, onClose }) {
+      const [dontShow, setDontShow] = useState(false);
+      const close = () => first ? onClose(dontShow) : onClose();
+      return (
+        <Modal onClose={close}>
+          <div className="text-center mb-3">
+            <div className="text-4xl mb-1">👋</div>
+            <h2 className="font-display text-xl font-extrabold text-1">{first ? 'Welcome to Premium Tracker!' : 'Premium Tracker'}</h2>
+            <p className="text-3 text-xs mt-1">Your tour management sidekick 🚌</p>
+          </div>
+          <div className="space-y-1.5 text-xs mb-3 text-2">
+            <InfoLine emoji="📁" t="Events" body="are folders. Each event holds your tour days." />
+            <InfoLine emoji="📅" t="New Day" body="inside an event tracks that day's inventory." />
+            <InfoLine emoji="🔄" t="Restocks" body="logged with timestamps as the day goes." />
+            <InfoLine emoji="🔢" t="Leftover" body="end of day → auto-calcs Given Out." />
+            <InfoLine emoji="🔒" t="Close Out" body="locks the day. Reopen anytime." />
+            <InfoLine emoji="📤" t="Export" body="recap to share with your team." />
+            <InfoLine emoji="🏆" t="End Tour" body="(in Settings ⚙️) → beautiful summary you can share!" />
+          </div>
+          <p className="text-[11px] text-3 text-center mb-3">
+            ✨ Tap the <b className="text-1">ⓘ</b> button anytime to see this again.
+          </p>
+          {first && (
+            <label className="flex items-center gap-2 text-xs text-2 mb-3 cursor-pointer select-none">
+              <input type="checkbox" checked={dontShow} onChange={e => setDontShow(e.target.checked)} className="w-4 h-4" />
+              <span>Don't show this again</span>
+            </label>
+          )}
+          <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-3 mb-3 py-2 rounded-md bg-surface-2 border border-line hover:text-accent active:scale-[0.99] transition">
+            ☕ Enjoying the app? <b className="underline">Buy me a coffee →</b>
+          </a>
+          <button onClick={close} className="w-full bg-inverse font-bold py-2.5 rounded-md text-sm flex items-center justify-center gap-1.5">
+            Got it 👍
+          </button>
+        </Modal>
+      );
+    }
+    function InfoLine({ emoji, t, body }) {
+      return (
+        <div className="flex items-start gap-2">
+          <span className="shrink-0">{emoji}</span>
+          <span><b className="text-1">{t}</b> {body}</span>
+        </div>
+      );
+    }
+
+    // === HOME (events list) ===
+    function Home({ events, daysIndex, onOpenEvent, onCreateEvent, onLibrary, onInfo, onDeleteEvent, onRenameEvent }) {
+      const [showCreate, setShowCreate] = useState(false);
+      const [editingEvent, setEditingEvent] = useState(null);
+      const activeEvents = events.filter(e => daysIndex.some(d => d.eventId === e.id && d.status === 'active')).length;
+      const totalDays = daysIndex.length;
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold flex items-center gap-1">🎁 Tour Inventory</div>
+              <h1 className="font-display text-2xl font-extrabold leading-tight text-1 flex items-center gap-1.5">Premium<span className="text-accent">.</span></h1>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+              <button onClick={onLibrary} className="p-2 rounded-lg bg-surface border border-line active:scale-95" aria-label="Settings">
+                <Settings className="w-4 h-4 text-3" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs font-data mb-4 px-1">
+            <span><span className="text-4">Events</span> <b className="text-1">{events.length}</b></span>
+            <span className="text-5">·</span>
+            <span><span className="text-4">Active</span> <b className="text-accent">{activeEvents}</b></span>
+            <span className="text-5">·</span>
+            <span><span className="text-4">Days</span> <b className="text-amber">{totalDays}</b></span>
+          </div>
+
+          <button onClick={() => setShowCreate(true)} className="w-full mb-4 bg-inverse font-bold py-3 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.98]">
+            <Plus className="w-4 h-4" strokeWidth={3} />
+            <span className="font-display text-base">New Event</span>
+          </button>
+
+          {events.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-line rounded-xl">
+              <div className="text-3xl mb-1">📁</div>
+              <p className="text-sm text-3">Tap <b className="text-accent">New Event</b> to start your tour</p>
+              <p className="text-xs text-4 mt-2">e.g. "LA County Fair"</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {events.map(ev => (
+                <EventCard key={ev.id} event={ev} daysIndex={daysIndex} onClick={() => onOpenEvent(ev.id)} onEdit={() => setEditingEvent(ev)} onDelete={() => onDeleteEvent(ev.id)} />
+              ))}
+            </div>
+          )}
+
+          {showCreate && (
+            <EventEditModal title="New Event" onClose={() => setShowCreate(false)} onSave={(n, c, m) => { onCreateEvent(n, c, m); setShowCreate(false); }} />
+          )}
+          {editingEvent && (
+            <EventEditModal title="Edit Event" initial={editingEvent} onClose={() => setEditingEvent(null)} onSave={(n, c, m) => { onRenameEvent(editingEvent.id, n, c, m); setEditingEvent(null); }} />
+          )}
+        </div>
+      );
+    }
+
+    function EventCard({ event, daysIndex, onClick, onEdit, onDelete }) {
+      const [confirming, setConfirming] = useState(false);
+      const myDays = daysIndex.filter(d => d.eventId === event.id);
+      const activeDays = myDays.filter(d => d.status === 'active').length;
+      const totalOut = myDays.reduce((s, d) => s + (d.dayTotal || 0), 0);
+
+      return (
+        <div className="bg-surface border border-line rounded-xl overflow-hidden fade-in">
+          <div className="px-3 py-3 flex items-center gap-3">
+            <button type="button" onClick={onClick} className="flex-1 flex items-center gap-3 min-w-0 text-left active:opacity-60">
+              <div className="text-2xl shrink-0">📁</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="font-display font-extrabold text-base truncate text-1">{event.name}</span>
+                  {event.monthYear && (
+                    <span className="text-[9px] font-data font-bold text-3 px-1.5 py-0.5 rounded bg-surface-2 border border-line shrink-0">{monthYearShort(event.monthYear)}</span>
+                  )}
+                </div>
+                {event.city && (
+                  <div className="text-[11px] text-3 font-data flex items-center gap-0.5 truncate">
+                    <MapPin className="w-3 h-3" strokeWidth={2} /> {event.city}
+                  </div>
+                )}
+                <div className="text-[11px] text-3 font-data mt-0.5">
+                  {myDays.length} day{myDays.length !== 1 ? 's' : ''}
+                  {activeDays > 0 && <span className="text-accent"> · {activeDays} live</span>}
+                  {totalOut > 0 && <span className="text-amber"> · {totalOut} out</span>}
+                </div>
+              </div>
+            </button>
+            <div className="flex items-center gap-0.5 shrink-0">
+              {confirming ? (
+                <div className="flex flex-col gap-1 items-end">
+                  <div className="text-[10px] text-danger font-bold leading-tight text-right">Delete event<br/>+ {myDays.length} day{myDays.length !== 1 ? 's' : ''}?</div>
+                  <div className="flex gap-1">
+                    <button onClick={onDelete} className="px-2 py-0.5 bg-danger rounded text-[10px] font-bold">DELETE</button>
+                    <button onClick={() => setConfirming(false)} className="p-0.5 text-4"><X className="w-3 h-3" /></button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <button onClick={onEdit} className="p-1.5 text-4 hover:text-accent" aria-label="Edit"><Edit3 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setConfirming(true)} className="p-1.5 text-4 hover:text-danger" aria-label="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={onClick} className="p-1 text-5 active:opacity-60"><ChevronRight className="w-4 h-4" /></button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function EventEditModal({ title, initial, onClose, onSave }) {
+      const [name, setName] = useState(initial?.name || '');
+      const [city, setCity] = useState(initial?.city || '');
+      const [monthYear, setMonthYear] = useState(initial?.monthYear || '');
+      return (
+        <Modal onClose={onClose}>
+          <h3 className="font-display text-lg font-bold mb-3 text-1">{title}</h3>
+          <div className="space-y-2 mb-4">
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Event Name</span>
+              <input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="e.g. LA County Fair" className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute" />
+            </label>
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">City <span className="text-4 normal-case tracking-normal">(optional)</span></span>
+              <input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Los Angeles, CA" className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute" />
+            </label>
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Month/Year <span className="text-4 normal-case tracking-normal">(optional)</span></span>
+              <input type="month" value={monthYear} onChange={e => setMonthYear(e.target.value)} className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute" />
+              {monthYear && <div className="text-[10px] text-3 font-data mt-1">→ Displays as <b className="text-accent">{monthYearShort(monthYear)}</b></div>}
+            </label>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="flex-1 bg-surface-2 text-2 font-semibold py-2 rounded-md text-sm border border-line">Cancel</button>
+            <button onClick={() => name.trim() && onSave(name, city, monthYear)} disabled={!name.trim()} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm disabled:opacity-50">Save</button>
+          </div>
+        </Modal>
+      );
+    }
+
+    // === EVENT DETAIL ===
+    function EventDetail({ event, eventDays, onBack, onOpenDay, onCreateDay, onDeleteDay, onRenameEvent, onDeleteEvent, onInfo }) {
+      const [editing, setEditing] = useState(false);
+      const [confirmDelete, setConfirmDelete] = useState(false);
+      const activeCount = eventDays.filter(d => d.status === 'active').length;
+      const totalOut = eventDays.reduce((s, d) => s + (d.dayTotal || 0), 0);
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-4 pb-32">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 active:scale-95">
+              <ChevronLeft className="w-4 h-4" /><span className="text-xs">Home</span>
+            </button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex items-start gap-2 mb-1">
+              <div className="text-3xl">📁</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="font-display text-2xl font-extrabold leading-tight text-1 truncate">{event.name}</h1>
+                  {event.monthYear && (
+                    <span className="text-[10px] font-data font-bold text-2 px-1.5 py-0.5 rounded bg-surface-2 border border-line shrink-0">{monthYearShort(event.monthYear)}</span>
+                  )}
+                </div>
+                {event.city && (
+                  <div className="text-xs text-3 font-data flex items-center gap-1">
+                    <MapPin className="w-3 h-3" /> {event.city}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setEditing(true)} className="p-1.5 text-4 hover:text-accent" aria-label="Edit event">
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3 text-xs font-data px-1 mt-2">
+              <span><span className="text-4">Days</span> <b className="text-1">{eventDays.length}</b></span>
+              <span className="text-5">·</span>
+              <span><span className="text-4">Active</span> <b className="text-accent">{activeCount}</b></span>
+              <span className="text-5">·</span>
+              <span><span className="text-4">Out</span> <b className="text-amber">{totalOut.toLocaleString()}</b></span>
+            </div>
+          </div>
+
+          <button onClick={onCreateDay} className="w-full mb-4 bg-inverse font-bold py-3 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.98]">
+            <Plus className="w-4 h-4" strokeWidth={3} />
+            <span className="font-display text-base">New Day</span>
+          </button>
+
+          {eventDays.length === 0 ? (
+            <div className="text-center py-10 border border-dashed border-line rounded-xl">
+              <div className="text-3xl mb-1">📋</div>
+              <p className="text-sm text-3">Tap <b className="text-accent">New Day</b> to start tracking</p>
+            </div>
+          ) : (
+            <div className="bg-surface border border-line rounded-xl overflow-hidden divide-line">
+              {eventDays.map(d => <DayRow key={d.id} day={d} onClick={() => onOpenDay(d.id)} onDelete={() => onDeleteDay(d.id)} />)}
+            </div>
+          )}
+
+          <div className="mt-8">
+            {confirmDelete ? (
+              <div className="bg-danger-soft border border-danger rounded-lg p-3 fade-in">
+                <p className="text-xs text-danger font-bold mb-2">⚠️ This deletes the event AND all {eventDays.length} day{eventDays.length !== 1 ? 's' : ''} inside it. Cannot be undone.</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setConfirmDelete(false)} className="flex-1 bg-surface text-2 font-semibold py-2 rounded-md text-xs border border-line">Cancel</button>
+                  <button onClick={onDeleteEvent} className="flex-1 bg-danger font-bold py-2 rounded-md text-xs">Delete Everything</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)} className="w-full text-3 text-xs flex items-center justify-center gap-1 py-2 hover:text-danger">
+                <Trash2 className="w-3 h-3" /> Delete this event
+              </button>
+            )}
+          </div>
+
+          {editing && (
+            <EventEditModal title="Edit Event" initial={event} onClose={() => setEditing(false)} onSave={(n, c, m) => { onRenameEvent(n, c, m); setEditing(false); }} />
+          )}
+        </div>
+      );
+    }
+
+    function DayRow({ day, onClick, onDelete }) {
+      const [confirming, setConfirming] = useState(false);
+      return (
+        <div className="px-3 py-2.5 flex items-center gap-2.5 fade-in">
+          <button type="button" onClick={onClick} className="flex-1 flex items-center gap-2.5 min-w-0 text-left active:opacity-60">
+            <span className={`text-[9px] uppercase tracking-widest font-data font-bold px-1.5 py-0.5 rounded shrink-0 ${day.status === 'active' ? 'bg-accent-soft' : 'bg-status-closed'}`}>
+              {day.status === 'active' ? 'LIVE' : 'CLOSED'}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-display font-bold text-sm leading-tight text-1">
+                Week {day.weekNum} · Day {day.dayNum}
+              </div>
+              <div className="text-[11px] text-3 font-data leading-tight">{dateNice(day.date)}{day.status === 'closed' ? ` · ${day.dayTotal || 0} out` : ''}</div>
+            </div>
+          </button>
+          {confirming ? (
+            <div className="flex gap-1 shrink-0">
+              <button type="button" onClick={onDelete} className="px-1.5 py-0.5 bg-danger rounded text-[10px] font-bold">Del</button>
+              <button type="button" onClick={() => setConfirming(false)} className="p-0.5 text-4"><X className="w-3 h-3" /></button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button type="button" onClick={() => setConfirming(true)} className="p-1 text-4 hover:text-danger"><Trash2 className="w-3.5 h-3.5" /></button>
+              <button type="button" onClick={onClick} className="p-0.5 text-5 active:opacity-60"><ChevronRight className="w-4 h-4" /></button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // === DAY DETAIL ===
+    function DayDetail({ day, event, itemsLibrary, onSave, onBack, onExport, onInfo, showToast }) {
+      const [editHeader, setEditHeader] = useState(false);
+      const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+      const update = (patch) => onSave({ ...day, ...patch });
+      const isClosed = day.status === 'closed';
+      const closeDay = async () => { await onSave({ ...day, status: 'closed', closedAt: new Date().toISOString() }); setShowCloseConfirm(false); showToast('🔒 Closed'); };
+      const reopenDay = async () => { await onSave({ ...day, status: 'active', closedAt: null }); showToast('🔓 Reopened'); };
+      const dayTotal = Object.values(day.inventory).reduce((s, v) => {
+        const start = (v.starting || 0) + (v.restocks || []).reduce((a,r) => a + (r.amount||0), 0);
+        if (v.leftover === null || v.leftover === undefined) return s;
+        return s + Math.max(0, start - v.leftover);
+      }, 0);
+
+      return (
+        <div className="max-w-2xl mx-auto px-3 pt-3 pb-32">
+          <div className="flex items-center justify-between mb-2.5">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 active:scale-95">
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-xs truncate max-w-[180px]">{event?.name || 'Back'}</span>
+            </button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+              <button onClick={onExport} className="p-1.5 rounded-md bg-surface border border-line active:scale-95" aria-label="Export">
+                <FileText className="w-3.5 h-3.5 text-3" />
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-surface border border-line rounded-xl p-3 mb-3">
+            {editHeader ? (
+              <div className="space-y-2 fade-in">
+                <div className="grid grid-cols-3 gap-1.5">
+                  <SlimInput label="Wk" type="number" value={day.weekNum} onChange={v => update({ weekNum: parseInt(v)||0 })} />
+                  <SlimInput label="Day" type="number" value={day.dayNum} onChange={v => update({ dayNum: parseInt(v)||0 })} />
+                  <SlimInput label="Date" type="date" value={day.date} onChange={v => update({ date: v })} />
+                </div>
+                <button onClick={() => setEditHeader(false)} className="w-full bg-inverse font-semibold py-1.5 rounded-md text-xs flex items-center justify-center gap-1">
+                  <Check className="w-3 h-3" strokeWidth={3} /> Done
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-2">
+                <button onClick={() => !isClosed && setEditHeader(true)} className="text-left flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className={`text-[9px] uppercase tracking-widest font-data font-bold px-1.5 py-0.5 rounded ${isClosed ? 'bg-status-closed' : 'bg-accent-soft'}`}>
+                      {isClosed ? '🔒 CLOSED' : '🟢 LIVE'}
+                    </span>
+                    <span className="text-[10px] text-3 font-data">{dateNice(day.date)}</span>
+                  </div>
+                  <div className="font-display font-extrabold text-lg leading-tight text-1">
+                    Week {day.weekNum} · Day {day.dayNum}
+                  </div>
+                </button>
+                <div className="text-right">
+                  <div className="text-[8px] uppercase tracking-widest text-4 font-data">Total Out</div>
+                  <div className="font-data font-extrabold text-2xl text-amber leading-none">{dayTotal}</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <SectionLabel emoji="📦" title="Inventory" count={day.activeItems.length} />
+          <InventoryGrid day={day} itemsLibrary={itemsLibrary} update={update} isClosed={isClosed} showToast={showToast} />
+
+          <div className="mt-6">
+            {isClosed ? (
+              <button onClick={reopenDay} className="w-full bg-surface border border-line text-1 font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                <Unlock className="w-3.5 h-3.5" /> Reopen Day
+              </button>
+            ) : (
+              <button onClick={() => setShowCloseConfirm(true)} className="w-full bg-danger-soft border border-danger text-danger font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                <Lock className="w-3.5 h-3.5" /> Close Out Day
+              </button>
+            )}
+          </div>
+
+          {showCloseConfirm && (
+            <Modal onClose={() => setShowCloseConfirm(false)}>
+              <div className="text-center">
+                <div className="text-3xl mb-2">🔒</div>
+                <h3 className="font-display text-lg font-bold mb-1 text-1">Close out this day?</h3>
+                <p className="text-3 text-xs mb-4">Totals lock. Can be reopened later. 👌</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowCloseConfirm(false)} className="flex-1 bg-surface-2 text-2 font-semibold py-2 rounded-md text-sm border border-line">Cancel</button>
+                  <button onClick={closeDay} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm">Close Out</button>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </div>
+      );
+    }
+
+    function SectionLabel({ emoji, title, count }) {
+      return (
+        <div className="flex items-center gap-1.5 mb-1.5 px-1">
+          <span className="text-sm">{emoji}</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] font-data font-bold text-2">{title}</span>
+          {count > 0 && <span className="text-[9px] font-data font-bold text-4">· {count}</span>}
+        </div>
+      );
+    }
+    function SlimInput({ label, value, onChange, type='text', placeholder='' }) {
+      return (
+        <label className="block">
+          <span className="text-[8px] uppercase tracking-widest text-4 font-data font-bold">{label}</span>
+          <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="input mt-0.5 w-full rounded-md px-2 py-1 text-xs font-data font-bold placeholder-mute" />
+        </label>
+      );
+    }
+
+    // === INVENTORY ===
+    function InventoryGrid({ day, itemsLibrary, update, isClosed, showToast }) {
+      const [showAdd, setShowAdd] = useState(false);
+      const setItem = (n, p) => update({ inventory: { ...day.inventory, [n]: { ...day.inventory[n], ...p } } });
+      const addRestock = (n, a) => {
+        if (!a || a <= 0) return;
+        const cur = day.inventory[n] || { starting: 0, restocks: [], leftover: null };
+        setItem(n, { restocks: [...(cur.restocks || []), { amount: a, time: new Date().toISOString() }] });
+        showToast(`+${a} ${n}`);
+      };
+      const removeRestock = (n, i) => setItem(n, { restocks: day.inventory[n].restocks.filter((_, idx) => idx !== i) });
+      const addItem = (n) => {
+        if (day.activeItems.includes(n)) return;
+        update({ activeItems: [...day.activeItems, n], inventory: { ...day.inventory, [n]: { starting: 0, restocks: [], leftover: null } } });
+        setShowAdd(false);
+      };
+      const removeItem = (n) => {
+        const inv = { ...day.inventory }; delete inv[n];
+        update({ activeItems: day.activeItems.filter(x => x !== n), inventory: inv });
+      };
+      const avail = itemsLibrary.filter(i => !day.activeItems.includes(i.name));
+
+      return (
+        <div className="space-y-1.5">
+          {day.activeItems.length === 0 && (
+            <div className="bg-surface border border-dashed border-line rounded-lg px-4 py-5 text-center">
+              <p className="text-xs text-3 mb-2">No items in play</p>
+              {!isClosed && <button onClick={() => setShowAdd(true)} className="text-accent text-xs font-bold">+ Pick items</button>}
+            </div>
+          )}
+          {day.activeItems.map(name => (
+            <CompactItem key={name} name={name} emoji={getEmoji(itemsLibrary, name)}
+              data={day.inventory[name] || { starting: 0, restocks: [], leftover: null }}
+              isClosed={isClosed}
+              onUpdate={(p) => setItem(name, p)}
+              onAddRestock={(a) => addRestock(name, a)}
+              onRemoveRestock={(i) => removeRestock(name, i)}
+              onRemove={() => removeItem(name)} />
+          ))}
+          {!isClosed && avail.length > 0 && (
+            <button onClick={() => setShowAdd(true)} className="w-full bg-surface border border-dashed border-line text-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 active:scale-[0.99]">
+              <Plus className="w-3 h-3" /> Add item
+            </button>
+          )}
+          {showAdd && (
+            <Modal onClose={() => setShowAdd(false)}>
+              <h3 className="font-display text-base font-bold mb-3 text-1">Add item to today</h3>
+              {avail.length === 0 ? (
+                <div className="text-center py-4 text-3 text-xs">All items added. Add new ones in Settings ⚙️</div>
+              ) : (
+                <div className="space-y-1">
+                  {avail.map(i => (
+                    <button key={i.name} onClick={() => addItem(i.name)} className="w-full text-left bg-surface-2 hover:opacity-80 rounded-md px-3 py-2 text-sm font-semibold flex items-center justify-between active:scale-[0.99] text-1 border border-line">
+                      <span>{i.emoji} {i.name}</span>
+                      <Plus className="w-3.5 h-3.5 text-accent" strokeWidth={3} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </Modal>
+          )}
+        </div>
+      );
+    }
+
+    function CompactItem({ name, emoji, data, isClosed, onUpdate, onAddRestock, onRemoveRestock, onRemove }) {
+      const [restockInput, setRestockInput] = useState('');
+      const [expanded, setExpanded] = useState(false);
+      const [confirmRm, setConfirmRm] = useState(false);
+      const restockTotal = (data.restocks || []).reduce((s, r) => s + (r.amount || 0), 0);
+      const start = (data.starting || 0) + restockTotal;
+      const lo = data.leftover;
+      const has = lo !== null && lo !== undefined && lo !== '';
+      const out = has ? Math.max(0, start - Number(lo)) : null;
+      const submit = () => { const n = parseInt(restockInput); if (n && n > 0) { onAddRestock(n); setRestockInput(''); } };
+
+      return (
+        <div className="bg-surface border border-line rounded-lg overflow-hidden">
+          <button onClick={() => setExpanded(!expanded)} type="button" className="w-full px-3 py-2 flex items-center gap-2 text-left active:opacity-80">
+            <span className="text-base shrink-0">{emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-bold text-sm truncate text-1">{name}</span>
+                {restockTotal > 0 && <span className="text-[9px] font-data font-bold bg-accent-soft px-1 py-px rounded">+{restockTotal}</span>}
+              </div>
+              <div className="text-[10px] font-data text-3 leading-tight">Total start: <b className="text-2">{start}</b></div>
+            </div>
+            <div className="text-right shrink-0">
+              <div className="text-[8px] uppercase tracking-widest text-4 font-data leading-none">Out</div>
+              <div className={`font-data font-extrabold text-xl leading-tight ${has ? 'text-amber' : 'text-5'}`}>{out ?? '—'}</div>
+            </div>
+            <ChevronRight className={`w-4 h-4 text-4 transition-transform shrink-0 ${expanded ? 'rotate-90' : ''}`} />
+          </button>
+          {expanded && (
+            <div className="border-t border-line-soft px-3 py-2.5 bg-surface-2 fade-in">
+              <div className="grid grid-cols-2 gap-1.5 mb-2">
+                <label className="block">
+                  <span className="text-[9px] uppercase tracking-widest text-3 font-data font-bold">Starting</span>
+                  <input type="number" inputMode="numeric" value={data.starting || ''} onChange={e => onUpdate({ starting: parseInt(e.target.value) || 0 })} disabled={isClosed} placeholder="0" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
+                </label>
+                <label className="block">
+                  <span className="text-[9px] uppercase tracking-widest text-3 font-data font-bold">Leftover</span>
+                  <input type="number" inputMode="numeric" value={lo === null || lo === undefined ? '' : lo} onChange={e => { const v = e.target.value; onUpdate({ leftover: v === '' ? null : parseInt(v) || 0 }); }} disabled={isClosed} placeholder="—" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
+                </label>
+              </div>
+              {!isClosed && (
+                <div className="flex gap-1.5 mb-2">
+                  <input type="number" inputMode="numeric" value={restockInput} onChange={e => setRestockInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} placeholder="+ stock amount" className="input-2 flex-1 rounded-md px-2 py-1.5 text-xs font-data placeholder-mute" />
+                  <button onClick={submit} className="px-3 bg-accent rounded-md font-bold text-xs active:scale-95">+ Stock</button>
+                </div>
+              )}
+              {(data.restocks || []).length > 0 && (
+                <div className="bg-surface border border-line rounded-md divide-line">
+                  {data.restocks.map((r, i) => (
+                    <div key={i} className="flex items-center justify-between px-2 py-1 text-[10px] font-data">
+                      <span className="text-3 flex items-center gap-1"><Clock className="w-2.5 h-2.5" />{timeShort(r.time)}</span>
+                      <span className="font-bold text-accent">+{r.amount}</span>
+                      {!isClosed && <button onClick={() => onRemoveRestock(i)} className="text-4 hover:text-danger"><X className="w-2.5 h-2.5" /></button>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!isClosed && (
+                <div className="mt-2 flex justify-end">
+                  {confirmRm ? (
+                    <div className="flex gap-1">
+                      <button onClick={onRemove} className="px-2 py-0.5 bg-danger rounded text-[10px] font-bold">Remove item</button>
+                      <button onClick={() => setConfirmRm(false)} className="p-0.5 text-4"><X className="w-3 h-3" /></button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmRm(true)} className="text-[10px] text-4 hover:text-danger flex items-center gap-0.5">
+                      <Trash2 className="w-2.5 h-2.5" /> remove
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // === LIBRARY ===
+    function Library({ items, onChange, onBack, onEndTour, onInfo, showToast, hasData }) {
+      const [newItem, setNewItem] = useState('');
+      const [editing, setEditing] = useState(null);
+      const [confirming, setConfirming] = useState(null);
+
+      const addItem = () => {
+        const n = newItem.trim();
+        if (!n || items.find(i => i.name.toLowerCase() === n.toLowerCase())) return;
+        const emoji = smartEmoji(n);
+        onChange([...items, { name: n, emoji }]);
+        setNewItem('');
+        showToast(`${emoji} Added ${n}`);
+      };
+      const removeItem = (name) => { onChange(items.filter(i => i.name !== name)); setConfirming(null); showToast(`Removed`); };
+      const saveEdit = (oldName, newName, newEmoji) => {
+        const safeName = newName.trim() || oldName;
+        const safeEmoji = newEmoji.trim() || '📦';
+        onChange(items.map(i => i.name === oldName ? { name: safeName, emoji: safeEmoji } : i));
+        setEditing(null);
+        showToast(`Updated`);
+      };
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 text-xs"><ChevronLeft className="w-4 h-4" /> Home</button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+            </div>
+          </div>
+          <div className="mb-4">
+            <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold">Settings</div>
+            <h1 className="font-display text-2xl font-extrabold text-1">Items Library 📚</h1>
+            <p className="text-3 text-xs mt-1.5">Items you can pick from when starting a day. Add or edit anytime.</p>
+          </div>
+
+          <div className="bg-surface border border-line rounded-lg p-2 flex gap-1.5 mb-3">
+            <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === 'Enter' && addItem()} placeholder="New item (Stickers, Hats, etc.)" className="input flex-1 rounded-md px-2.5 py-1.5 text-sm placeholder-mute" />
+            <button onClick={addItem} disabled={!newItem.trim()} className="px-3 bg-accent rounded-md font-bold text-xs active:scale-95 disabled:opacity-40 flex items-center gap-0.5"><Plus className="w-3 h-3" strokeWidth={3} /> Add</button>
+          </div>
+
+          <div className="bg-surface border border-line rounded-lg overflow-hidden divide-line">
+            {items.map(item => (
+              <div key={item.name} className="px-3 py-2 flex items-center justify-between gap-2">
+                <span className="font-semibold text-sm flex items-center gap-2 text-1 min-w-0">
+                  <span className="text-lg shrink-0">{item.emoji}</span>
+                  <span className="truncate">{item.name}</span>
+                </span>
+                {confirming === item.name ? (
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => removeItem(item.name)} className="px-2 py-0.5 bg-danger rounded text-[10px] font-bold">Remove</button>
+                    <button onClick={() => setConfirming(null)} className="p-0.5 text-4"><X className="w-3 h-3" /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <button onClick={() => setEditing(item)} className="p-1.5 text-4 hover:text-accent" aria-label="Edit"><Edit3 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setConfirming(item.name)} className="p-1.5 text-4 hover:text-danger" aria-label="Remove"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {items.length === 0 && <div className="px-3 py-6 text-center text-4 text-xs">Empty — add one above 👆</div>}
+          </div>
+
+          {hasData && (
+            <div className="mt-8">
+              <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">End of Tour</div>
+              <button onClick={onEndTour} className="w-full summary-gradient border border-line rounded-xl p-4 flex items-center gap-3 active:scale-[0.99]">
+                <div className="text-3xl">🏆</div>
+                <div className="flex-1 text-left">
+                  <div className="font-display font-extrabold text-base text-1">End Tour</div>
+                  <div className="text-xs text-2">Generate a beautiful summary card you can save & share</div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-3" />
+              </button>
+            </div>
+          )}
+
+          {editing && (
+            <EditItemModal item={editing} onClose={() => setEditing(null)} onSave={(name, emoji) => saveEdit(editing.name, name, emoji)} />
+          )}
+        </div>
+      );
+    }
+
+    function EditItemModal({ item, onClose, onSave }) {
+      const [name, setName] = useState(item.name);
+      const [emoji, setEmoji] = useState(item.emoji);
+      const suggestions = [item.emoji, smartEmoji(name), '📦', '🎁', '✨', '🏷️', '👕', '🛍️', '💧'].filter((v, i, a) => v && a.indexOf(v) === i).slice(0, 6);
+      return (
+        <Modal onClose={onClose}>
+          <h3 className="font-display text-lg font-bold mb-3 text-1">Edit Item</h3>
+          <div className="space-y-2 mb-3">
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Name</span>
+              <input value={name} onChange={e => setName(e.target.value)} autoFocus className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute" />
+            </label>
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Emoji</span>
+              <input value={emoji} onChange={e => setEmoji(e.target.value)} maxLength={4} placeholder="📦" className="input mt-0.5 w-full rounded-md px-3 py-2 text-xl text-center placeholder-mute" />
+            </label>
+            <div>
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Suggestions</span>
+              <div className="flex gap-1.5 mt-1 flex-wrap">
+                {suggestions.map(e => (
+                  <button key={e} onClick={() => setEmoji(e)} className={`text-xl w-9 h-9 rounded-md border ${emoji === e ? 'border-accent bg-accent-soft' : 'border-line bg-surface-2'} active:scale-95`}>{e}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="flex-1 bg-surface-2 text-2 font-semibold py-2 rounded-md text-sm border border-line">Cancel</button>
+            <button onClick={() => onSave(name, emoji)} disabled={!name.trim()} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm disabled:opacity-50">Save</button>
+          </div>
+        </Modal>
+      );
+    }
+
+    // === TOUR SUMMARY ===
+    function TourSummary({ events, daysIndex, itemsLibrary, theme, onBack, onStartNewTour, onInfo, showToast }) {
+      const [stats, setStats] = useState(null);
+      const [funFact, setFunFact] = useState(null);
+      const [showResetConfirm, setShowResetConfirm] = useState(false);
+      const [working, setWorking] = useState(false);
+      const cardRef = useRef(null);
+      const [congratsMsg] = useState(() => CONGRATS[Math.floor(Math.random() * CONGRATS.length)]);
+
+      useEffect(() => { (async () => {
+        // Compute stats from index + load each day for inventory details
+        const itemTotals = {};
+        let totalGivenOut = 0;
+        for (const dEntry of daysIndex) {
+          const full = await sget(`d:${dEntry.id}`, null);
+          if (!full) continue;
+          (full.activeItems || []).forEach(name => {
+            const v = full.inventory[name] || {};
+            const start = (v.starting || 0) + (v.restocks || []).reduce((a,r) => a + (r.amount||0), 0);
+            const lo = v.leftover;
+            if (lo === null || lo === undefined) return;
+            const given = Math.max(0, start - lo);
+            itemTotals[name] = (itemTotals[name] || 0) + given;
+            totalGivenOut += given;
+          });
+        }
+        const dates = daysIndex.map(d => d.date).filter(Boolean).sort();
+        const cities = [...new Set(events.map(e => e.city).filter(Boolean))];
+        const itemRows = Object.entries(itemTotals).sort((a, b) => b[1] - a[1]);
+        const maxItem = Math.max(1, ...Object.values(itemTotals));
+
+        setStats({
+          totalGivenOut, itemTotals, itemRows, maxItem,
+          days: daysIndex.length, events: events.length, cities: cities.length, cityList: cities,
+          firstDate: dates[0], lastDate: dates[dates.length - 1]
+        });
+        setFunFact(getFunFact({
+          totalGivenOut,
+          days: daysIndex.length, events: events.length, cities: cities.length
+        }));
+      })(); }, []);
+
+      const handleSaveImage = async () => {
+        if (!cardRef.current || working) return;
+        setWorking(true);
+        try {
+          const canvas = await html2canvas(cardRef.current, {
+            backgroundColor: theme === 'dark' ? '#0a0a0a' : '#f5f5f4',
+            scale: 2,
+            useCORS: true,
+            logging: false
+          });
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tour-summary-${todayISO()}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📸 Saved!');
+          }, 'image/png');
+        } catch (e) {
+          console.error(e);
+          showToast('Save failed 😕');
+        }
+        setWorking(false);
+      };
+
+      const handleCopyText = async () => {
+        if (!stats) return;
+        const lines = [];
+        lines.push(`🏆 TOUR COMPLETE`);
+        lines.push(`━━━━━━━━━━━━━━━━━`);
+        if (stats.firstDate && stats.lastDate) lines.push(`${dateShort(stats.firstDate)} → ${dateShort(stats.lastDate)}`);
+        lines.push(``);
+        lines.push(`📦 Total Given Out: ${stats.totalGivenOut.toLocaleString()}`);
+        lines.push(`📅 Days Worked: ${stats.days}`);
+        lines.push(`📁 Events: ${stats.events}`);
+        if (stats.cities > 0) lines.push(`📍 Cities: ${stats.cities} (${stats.cityList.join(', ')})`);
+        lines.push(``);
+        if (stats.itemRows.length > 0) {
+          lines.push(`📊 By Item:`);
+          stats.itemRows.forEach(([name, val]) => {
+            lines.push(`  ${getEmoji(itemsLibrary, name)} ${name}: ${val.toLocaleString()}`);
+          });
+          lines.push(``);
+        }
+        lines.push(congratsMsg);
+        if (funFact) {
+          lines.push(``);
+          lines.push(`🎲 Fun Fact: ${funFact}`);
+        }
+        try {
+          await navigator.clipboard.writeText(lines.join('\n'));
+          showToast('📋 Copied!');
+        } catch {
+          showToast('Copy failed');
+        }
+      };
+
+      if (!stats) {
+        return (
+          <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
+            <div className="flex items-center justify-between mb-3">
+              <button onClick={onBack} className="flex items-center gap-1 text-3 text-xs"><ChevronLeft className="w-4 h-4" /> Back</button>
+              <ThemeToggle />
+            </div>
+            <div className="text-center py-12 text-3 text-sm font-data">Crunching numbers…</div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 text-xs"><ChevronLeft className="w-4 h-4" /> Back</button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+            </div>
+          </div>
+
+          {/* Summary card (the bit that gets exported as PNG) */}
+          <div ref={cardRef} className="summary-gradient rounded-2xl p-5 mb-4 border border-line">
+            <div className="text-center mb-4">
+              <div className="text-5xl mb-2">🏆</div>
+              <h1 className="font-display text-3xl font-extrabold text-1 leading-tight">Tour Complete!</h1>
+              {stats.firstDate && stats.lastDate && (
+                <p className="text-xs text-3 font-data mt-1">
+                  {dateShort(stats.firstDate)} → {dateShort(stats.lastDate)}
+                </p>
+              )}
+            </div>
+
+            {/* Hero number */}
+            <div className="bg-surface border border-line rounded-xl p-4 mb-3 text-center">
+              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Total Given Out</div>
+              <div className="font-display font-extrabold text-5xl text-amber leading-none mt-1">{stats.totalGivenOut.toLocaleString()}</div>
+              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mt-1">items</div>
+            </div>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <StatBox emoji="📅" label="Days" value={stats.days} />
+              <StatBox emoji="📁" label="Events" value={stats.events} />
+              <StatBox emoji="📍" label="Cities" value={stats.cities || '—'} />
+            </div>
+
+            {/* Items chart */}
+            {stats.itemRows.length > 0 && (
+              <div className="bg-surface border border-line rounded-xl p-3 mb-3">
+                <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-2">📊 By Item</div>
+                <div className="space-y-1.5">
+                  {stats.itemRows.map(([name, val]) => (
+                    <div key={name} className="flex items-center gap-2">
+                      <div className="text-xs flex items-center gap-1 w-28 shrink-0">
+                        <span>{getEmoji(itemsLibrary, name)}</span>
+                        <span className="truncate text-1 font-semibold">{name}</span>
+                      </div>
+                      <div className="flex-1 h-5 bg-surface-2 rounded overflow-hidden relative">
+                        <div className="absolute inset-y-0 left-0 bg-accent" style={{ width: `${(val / stats.maxItem) * 100}%` }}></div>
+                      </div>
+                      <div className="font-data font-bold text-xs text-1 w-12 text-right">{val.toLocaleString()}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cities */}
+            {stats.cityList.length > 0 && (
+              <div className="bg-surface border border-line rounded-xl p-3 mb-3">
+                <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-1.5">📍 Cities Visited</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {stats.cityList.map(c => (
+                    <span key={c} className="text-xs font-semibold bg-surface-2 border border-line rounded-full px-2 py-0.5 text-1">{c}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fun Fact */}
+            {funFact && (
+              <div className="bg-surface border border-line rounded-xl p-3 mb-3">
+                <div className="text-[9px] uppercase tracking-widest text-3 font-data font-bold mb-1.5 text-center">🎲 Random Fun Fact</div>
+                <p className="text-xs text-2 leading-relaxed text-center">{funFact}</p>
+              </div>
+            )}
+
+            {/* Congrats */}
+            <div className="text-center text-sm font-semibold text-1 px-2 py-3">
+              {congratsMsg}
+            </div>
+          </div>
+
+          {/* Action buttons (NOT inside cardRef, so they don't appear in the PNG) */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <button onClick={handleSaveImage} disabled={working} className="bg-inverse font-bold py-2.5 rounded-md flex items-center justify-center gap-1.5 text-sm active:scale-95 disabled:opacity-50">
+              <ImageIcon className="w-3.5 h-3.5" strokeWidth={2.5} /> {working ? 'Saving…' : 'Save as PNG'}
+            </button>
+            <button onClick={handleCopyText} className="bg-surface text-1 border border-line font-bold py-2.5 rounded-md flex items-center justify-center gap-1.5 text-sm active:scale-95">
+              <Copy className="w-3.5 h-3.5" strokeWidth={2.5} /> Copy Text
+            </button>
+          </div>
+
+          {/* Start new tour */}
+          <div className="mt-8 pt-6 border-t border-line-soft">
+            <p className="text-center text-xs text-3 mb-3">Ready for the next adventure?</p>
+            <button onClick={() => setShowResetConfirm(true)} className="w-full bg-danger-soft border border-danger text-danger font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
+              🧹 Start New Tour
+            </button>
+            <p className="text-[10px] text-4 text-center mt-2">This wipes all events &amp; days. Library resets to defaults.</p>
+          </div>
+
+          {showResetConfirm && (
+            <Modal onClose={() => setShowResetConfirm(false)}>
+              <div className="text-center">
+                <div className="text-3xl mb-2">🧹</div>
+                <h3 className="font-display text-lg font-bold mb-1 text-1">Start a fresh tour?</h3>
+                <p className="text-3 text-xs mb-4">All events &amp; days will be deleted. Make sure you saved the summary first! 📸</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowResetConfirm(false)} className="flex-1 bg-surface-2 text-2 font-semibold py-2 rounded-md text-sm border border-line">Cancel</button>
+                  <button onClick={() => { setShowResetConfirm(false); onStartNewTour(); }} className="flex-1 bg-danger font-bold py-2 rounded-md text-sm">Wipe &amp; Start</button>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </div>
+      );
+    }
+
+    function StatBox({ emoji, label, value }) {
+      return (
+        <div className="bg-surface border border-line rounded-xl p-3 text-center">
+          <div className="text-xl mb-0.5">{emoji}</div>
+          <div className="font-data font-extrabold text-xl text-1 leading-none">{value}</div>
+          <div className="text-[9px] uppercase tracking-widest text-3 font-data font-bold mt-1">{label}</div>
+        </div>
+      );
+    }
+
+    // === EXPORT (per day) ===
+    function ExportView({ day, itemsLibrary, onBack, onInfo, showToast }) {
+      const summary = generateSummary(day, itemsLibrary);
+      const csv = generateCSV(day);
+      const copyText = async () => { try { await navigator.clipboard.writeText(summary); showToast('📋 Copied'); } catch { showToast('Copy failed'); } };
+      const downloadCSV = () => {
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safe = (day.eventName || 'event').replace(/[^a-z0-9]/gi, '_');
+        a.download = `${safe}_W${day.weekNum}_D${day.dayNum}_${day.date}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('💾 Downloaded');
+      };
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 text-xs"><ChevronLeft className="w-4 h-4" /> Back</button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+            </div>
+          </div>
+          <div className="mb-4">
+            <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold">Day Summary</div>
+            <h1 className="font-display text-2xl font-extrabold text-1">Export 📤</h1>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <button onClick={copyText} className="bg-inverse font-bold py-2.5 rounded-md flex items-center justify-center gap-1.5 text-sm active:scale-95"><Copy className="w-3.5 h-3.5" strokeWidth={2.5} /> Copy Text</button>
+            <button onClick={downloadCSV} className="bg-surface text-1 border border-line font-bold py-2.5 rounded-md flex items-center justify-center gap-1.5 text-sm active:scale-95"><Download className="w-3.5 h-3.5" strokeWidth={2.5} /> CSV</button>
+          </div>
+          <div className="bg-surface border border-line rounded-lg p-3">
+            <div className="text-[10px] uppercase tracking-widest text-4 font-data mb-1.5">Preview</div>
+            <pre className="text-[11px] font-data whitespace-pre-wrap text-2 leading-relaxed">{summary}</pre>
+          </div>
+        </div>
+      );
+    }
+
+    function generateSummary(day, itemsLibrary) {
+      let s = `📋 DAILY RECAP\n━━━━━━━━━━━━━━━━━━\n`;
+      s += `Event: ${day.eventName || 'Untitled'}\nWeek ${day.weekNum} · Day ${day.dayNum} · ${dateNice(day.date)}\nStatus: ${day.status === 'closed' ? '🔒 Closed' : '🟢 Active'}\n\n`;
+      s += `📦 INVENTORY\n──────────────────\n`;
+      let dt = 0;
+      day.activeItems.forEach(name => {
+        const v = day.inventory[name] || {};
+        const rt = (v.restocks || []).reduce((a,r) => a + (r.amount||0), 0);
+        const start = (v.starting || 0) + rt;
+        const lo = v.leftover;
+        const given = (lo === null || lo === undefined) ? null : Math.max(0, start - lo);
+        if (given !== null) dt += given;
+        s += `${getEmoji(itemsLibrary, name)} ${name}\n  Start: ${v.starting || 0}${rt ? ` (+${rt})` : ''} = ${start}\n  Leftover: ${lo ?? '—'}\n  Given: ${given ?? '—'}\n\n`;
+      });
+      s += `TOTAL GIVEN OUT: ${dt}\n`;
+      return s;
+    }
+
+    function generateCSV(day) {
+      let rows = [['Event', day.eventName || ''], ['Week', day.weekNum], ['Day', day.dayNum], ['Date', day.date], ['Status', day.status], [], ['INVENTORY'], ['Item','Starting','Restocks','Total Start','Leftover','Given Out']];
+      day.activeItems.forEach(name => {
+        const v = day.inventory[name] || {};
+        const rt = (v.restocks || []).reduce((a,r) => a + (r.amount||0), 0);
+        const start = (v.starting || 0) + rt;
+        const lo = v.leftover;
+        const g = (lo === null || lo === undefined) ? '' : Math.max(0, start - lo);
+        rows.push([name, v.starting || 0, rt, start, lo ?? '', g]);
+      });
+      return rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    }
+
+    // === MODAL ===
+    function Modal({ children, onClose }) {
+      return (
+        <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-3 modal-overlay backdrop-blur-sm fade-in" onClick={onClose}>
+          <div onClick={e => e.stopPropagation()} className="bg-surface border border-line rounded-xl p-4 w-full max-w-sm shadow-2xl max-h-[85vh] overflow-y-auto">{children}</div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
