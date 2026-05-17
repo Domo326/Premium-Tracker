@@ -9,13 +9,32 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Premium" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="theme-color" content="#0c4a6e" />
+
+  <!-- PWA icons -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Lower md: breakpoint from 768px → 700px so Z Fold 7 in portrait (~757px) triggers the sidebar layout
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: {
+            'md': '700px'
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -468,24 +487,50 @@
       return (
         <ThemeCtx.Provider value={{ theme, toggle: toggleTheme }}>
           <div className={`theme-${theme} min-h-screen w-full bg-app text-1 font-body`}>
-            {screen === 'home' && (
-              <Home events={events} daysIndex={daysIndex} onOpenEvent={openEvent} onCreateEvent={createEvent} onLibrary={() => setScreen('library')} onInfo={() => setShowInfo(true)} onDeleteEvent={deleteEvent} onRenameEvent={renameEvent} />
-            )}
-            {screen === 'event' && currentEvent && (
-              <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
-            )}
-            {screen === 'day' && currentDay && (
-              <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} showToast={showToast} />
-            )}
-            {screen === 'library' && (
-              <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} />
-            )}
-            {screen === 'summary' && (
-              <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
-            )}
-            {screen === 'export' && currentDay && (
-              <ExportView day={currentDay} itemsLibrary={itemsLibrary} onBack={() => setScreen('day')} onInfo={() => setShowInfo(true)} showToast={showToast} />
-            )}
+            <div className="md:flex md:h-screen">
+              {/* Sidebar — wide screens only (foldables unfolded, tablets, desktop) */}
+              <aside className="hidden md:flex md:flex-col md:w-72 lg:w-80 md:shrink-0 md:h-screen md:border-r md:border-line bg-surface-2">
+                <EventsSidebar
+                  events={events}
+                  daysIndex={daysIndex}
+                  currentEventId={currentEventId}
+                  onOpenEvent={openEvent}
+                  onCreateEvent={createEvent}
+                  onLibrary={() => setScreen('library')}
+                  onInfo={() => setShowInfo(true)}
+                  onHome={() => { setScreen('home'); setCurrentEventId(null); setCurrentDay(null); setCurrentDayId(null); }}
+                />
+              </aside>
+
+              {/* Main pane */}
+              <main className="md:flex-1 md:h-screen md:overflow-y-auto">
+                {screen === 'home' && (
+                  <>
+                    <div className="md:hidden">
+                      <Home events={events} daysIndex={daysIndex} onOpenEvent={openEvent} onCreateEvent={createEvent} onLibrary={() => setScreen('library')} onInfo={() => setShowInfo(true)} onDeleteEvent={deleteEvent} onRenameEvent={renameEvent} />
+                    </div>
+                    <div className="hidden md:block">
+                      <WidePlaceholder />
+                    </div>
+                  </>
+                )}
+                {screen === 'event' && currentEvent && (
+                  <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
+                )}
+                {screen === 'day' && currentDay && (
+                  <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} showToast={showToast} />
+                )}
+                {screen === 'library' && (
+                  <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} />
+                )}
+                {screen === 'summary' && (
+                  <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
+                )}
+                {screen === 'export' && currentDay && (
+                  <ExportView day={currentDay} itemsLibrary={itemsLibrary} onBack={() => setScreen('day')} onInfo={() => setShowInfo(true)} showToast={showToast} />
+                )}
+              </main>
+            </div>
 
             {showWelcome && <InfoModal first onClose={dismissWelcome} />}
             {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
@@ -543,6 +588,97 @@
         <div className="flex items-start gap-2">
           <span className="shrink-0">{emoji}</span>
           <span><b className="text-1">{t}</b> {body}</span>
+        </div>
+      );
+    }
+
+    // === EVENTS SIDEBAR (foldable / wide screens only) ===
+    function EventsSidebar({ events, daysIndex, currentEventId, onOpenEvent, onCreateEvent, onLibrary, onInfo, onHome }) {
+      const [showCreate, setShowCreate] = useState(false);
+      const activeEvents = events.filter(e => daysIndex.some(d => d.eventId === e.id && d.status === 'active')).length;
+      const totalDays = daysIndex.length;
+      return (
+        <div className="flex flex-col h-full">
+          <div className="px-4 pt-5 pb-3 border-b border-line shrink-0">
+            <button onClick={onHome} className="text-left mb-3 active:opacity-60 block w-full">
+              <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold flex items-center gap-1">🎁 Tour Inventory</div>
+              <h1 className="font-display text-2xl font-extrabold leading-tight text-1 flex items-center gap-1.5">Premium<span className="text-accent">.</span></h1>
+            </button>
+            <div className="flex items-center gap-2 text-xs font-data mb-3 flex-wrap">
+              <span><span className="text-4">Events</span> <b className="text-1">{events.length}</b></span>
+              <span className="text-5">·</span>
+              <span><span className="text-4">Active</span> <b className="text-accent">{activeEvents}</b></span>
+              <span className="text-5">·</span>
+              <span><span className="text-4">Days</span> <b className="text-amber">{totalDays}</b></span>
+            </div>
+            <div className="flex gap-1.5 mb-2">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+              <button onClick={onLibrary} className="flex-1 p-2 rounded-lg bg-surface border border-line active:scale-95 text-xs font-semibold text-2 flex items-center justify-center gap-1.5">
+                <Settings className="w-3.5 h-3.5" /> Settings
+              </button>
+            </div>
+            <button onClick={() => setShowCreate(true)} className="w-full bg-inverse font-bold py-2.5 rounded-lg flex items-center justify-center gap-1.5 active:scale-[0.98]">
+              <Plus className="w-3.5 h-3.5" strokeWidth={3} />
+              <span className="font-display text-sm">New Event</span>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-2 py-2">
+            {events.length === 0 ? (
+              <div className="text-center py-10 px-3">
+                <div className="text-3xl mb-2">📁</div>
+                <p className="text-xs text-3">Tap <b className="text-accent">New Event</b> to start</p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {events.map(ev => (
+                  <SidebarEventItem key={ev.id} event={ev} daysIndex={daysIndex} selected={ev.id === currentEventId} onClick={() => onOpenEvent(ev.id)} />
+                ))}
+              </div>
+            )}
+          </div>
+          {showCreate && (
+            <EventEditModal title="New Event" onClose={() => setShowCreate(false)} onSave={(n, c, m) => { onCreateEvent(n, c, m); setShowCreate(false); }} />
+          )}
+        </div>
+      );
+    }
+
+    function SidebarEventItem({ event, daysIndex, selected, onClick }) {
+      const myDays = daysIndex.filter(d => d.eventId === event.id);
+      const activeDays = myDays.filter(d => d.status === 'active').length;
+      return (
+        <button onClick={onClick} className={`w-full text-left px-2.5 py-2 rounded-lg transition active:scale-[0.99] ${selected ? 'bg-accent-soft border border-accent' : 'border border-transparent hover:bg-surface'}`}>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-base shrink-0">📁</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-display font-bold text-sm truncate text-1">{event.name}</span>
+                {event.monthYear && (
+                  <span className="text-[9px] font-data font-bold text-3 px-1 py-0.5 rounded bg-surface-2 border border-line shrink-0">{monthYearShort(event.monthYear)}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-data text-3 min-w-0">
+                {event.city && <span className="truncate">📍 {event.city}</span>}
+                {event.city && <span className="text-5 shrink-0">·</span>}
+                <span className="shrink-0">{myDays.length} day{myDays.length !== 1 ? 's' : ''}</span>
+                {activeDays > 0 && <span className="text-accent shrink-0">· {activeDays} live</span>}
+              </div>
+            </div>
+          </div>
+        </button>
+      );
+    }
+
+    // === Wide-screen placeholder (shown when no event selected on tablets/foldables) ===
+    function WidePlaceholder() {
+      return (
+        <div className="h-full min-h-[60vh] flex items-center justify-center p-8">
+          <div className="text-center max-w-sm">
+            <div className="text-6xl mb-4">📁</div>
+            <h2 className="font-display text-2xl font-extrabold text-1 mb-2">Pick an event</h2>
+            <p className="text-3 text-sm">Tap any event in the sidebar to start tracking, or create a new one.</p>
+          </div>
         </div>
       );
     }
@@ -1499,7 +1635,7 @@
     // === MODAL ===
     function Modal({ children, onClose }) {
       return (
-        <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-3 modal-overlay backdrop-blur-sm fade-in" onClick={onClose}>
+        <div className="fixed inset-0 z-40 flex items-start justify-center p-3 pt-6 modal-overlay backdrop-blur-sm fade-in" onClick={onClose}>
           <div onClick={e => e.stopPropagation()} className="bg-surface border border-line rounded-xl p-4 w-full max-w-sm shadow-2xl max-h-[85vh] overflow-y-auto">{children}</div>
         </div>
       );
