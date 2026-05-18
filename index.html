@@ -1146,7 +1146,13 @@
               <ThemeToggle />
               <button onClick={onStock} className="flex-1 p-2 rounded-lg bg-surface border border-line active:scale-95 text-xs font-semibold text-2 flex items-center justify-center gap-1.5 relative">
                 📦 Stock
-                {lowStockCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-[9px] font-data font-bold flex items-center justify-center">{lowStockCount}</span>}
+                {lowStockCount > 0 && (
+                  <span
+                    className="absolute w-2.5 h-2.5 rounded-full bg-danger"
+                    style={{ bottom: '-2px', right: '-2px', boxShadow: '0 0 0 2px var(--app-bg)' }}
+                    aria-label={`${lowStockCount} low-stock item${lowStockCount !== 1 ? 's' : ''}`}
+                  />
+                )}
               </button>
               <button onClick={onLibrary} className="flex-1 p-2 rounded-lg bg-surface border border-line active:scale-95 text-xs font-semibold text-2 flex items-center justify-center gap-1.5">
                 <Settings className="w-3.5 h-3.5" /> Settings
@@ -1250,7 +1256,13 @@
               <ThemeToggle />
               <button onClick={onStock} className="p-2 rounded-lg bg-surface border border-line active:scale-95 relative" aria-label="Stock">
                 <span className="text-base">📦</span>
-                {lowStockCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-[9px] font-data font-bold flex items-center justify-center">{lowStockCount}</span>}
+                {lowStockCount > 0 && (
+                  <span
+                    className="absolute w-2.5 h-2.5 rounded-full bg-danger"
+                    style={{ bottom: '-2px', right: '-2px', boxShadow: '0 0 0 2px var(--app-bg)' }}
+                    aria-label={`${lowStockCount} low-stock item${lowStockCount !== 1 ? 's' : ''}`}
+                  />
+                )}
               </button>
               <button onClick={onLibrary} className="p-2 rounded-lg bg-surface border border-line active:scale-95" aria-label="Settings">
                 <Settings className="w-4 h-4 text-3" />
