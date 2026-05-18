@@ -130,7 +130,7 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="text/babel" data-presets="react">
-    const { useState, useEffect, createContext, useContext, useRef } = React;
+    const { useState, useEffect, useMemo, createContext, useContext, useRef } = React;
 
     // === ICONS ===
     const Svg = ({ children, className = "w-4 h-4", strokeWidth = 2 }) => (
@@ -141,6 +141,8 @@
     const Check = (p) => <Svg {...p}><path d="M20 6 9 17l-5-5"/></Svg>;
     const ChevronLeft = (p) => <Svg {...p}><path d="m15 18-6-6 6-6"/></Svg>;
     const ChevronRight = (p) => <Svg {...p}><path d="m9 18 6-6-6-6"/></Svg>;
+    const ChevronUp = (p) => <Svg {...p}><path d="m18 15-6-6-6 6"/></Svg>;
+    const ChevronDown = (p) => <Svg {...p}><path d="m6 9 6 6 6-6"/></Svg>;
     const Lock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></Svg>;
     const Unlock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></Svg>;
     const Download = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Svg>;
@@ -456,7 +458,73 @@
         showToast('🗑️ Day deleted');
       };
 
+      const reorderDay = async (dayId, direction) => {
+        const idx = daysIndex.findIndex(d => d.id === dayId);
+        if (idx === -1) return;
+        const eventId = daysIndex[idx].eventId;
+        const myEventDays = daysIndex.filter(d => d.eventId === eventId);
+        const myPos = myEventDays.findIndex(d => d.id === dayId);
+        const swapPos = direction === 'up' ? myPos - 1 : myPos + 1;
+        if (swapPos < 0 || swapPos >= myEventDays.length) return;
+        const swapId = myEventDays[swapPos].id;
+        const swapGlobalIdx = daysIndex.findIndex(d => d.id === swapId);
+        const newIdx = [...daysIndex];
+        [newIdx[idx], newIdx[swapGlobalIdx]] = [newIdx[swapGlobalIdx], newIdx[idx]];
+        await sset('idx', newIdx);
+        setDaysIndex(newIdx);
+      };
+
       const updateLibrary = async (next) => { setItemsLibrary(next); await sset('items', next); };
+
+      const exportData = async () => {
+        const days = {};
+        for (const di of daysIndex) {
+          const day = await sget(`d:${di.id}`, null);
+          if (day) days[di.id] = day;
+        }
+        return {
+          version: 1,
+          app: 'tracker',
+          exportedAt: new Date().toISOString(),
+          events,
+          daysIndex,
+          itemsLibrary,
+          days
+        };
+      };
+
+      const importData = async (incoming, mode) => {
+        if (mode === 'replace') {
+          const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx' || k === 'tracker:items');
+          keys.forEach(k => localStorage.removeItem(k));
+          const newEvents = incoming.events || [];
+          const newIdx = incoming.daysIndex || [];
+          const newItems = incoming.itemsLibrary || DEFAULT_ITEMS;
+          await sset('events', newEvents);
+          await sset('idx', newIdx);
+          await sset('items', newItems);
+          for (const [id, day] of Object.entries(incoming.days || {})) {
+            await sset(`d:${id}`, day);
+          }
+          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems);
+          setCurrentDay(null); setCurrentDayId(null); setCurrentEventId(null);
+          setScreen('home');
+        } else if (mode === 'merge') {
+          const existingEventIds = new Set(events.map(e => e.id));
+          const newEvents = [...events, ...((incoming.events || []).filter(e => !existingEventIds.has(e.id)))];
+          const existingDayIds = new Set(daysIndex.map(d => d.id));
+          const newIdx = [...daysIndex, ...((incoming.daysIndex || []).filter(d => !existingDayIds.has(d.id)))];
+          for (const [id, day] of Object.entries(incoming.days || {})) {
+            if (!existingDayIds.has(id)) await sset(`d:${id}`, day);
+          }
+          const existingItemNames = new Set(itemsLibrary.map(i => i.name.toLowerCase()));
+          const newItems = [...itemsLibrary, ...((incoming.itemsLibrary || []).filter(i => !existingItemNames.has(i.name.toLowerCase())))];
+          await sset('events', newEvents);
+          await sset('idx', newIdx);
+          await sset('items', newItems);
+          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems);
+        }
+      };
 
       const startNewTour = async () => {
         const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:') && (k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx'));
@@ -515,13 +583,13 @@
                   </>
                 )}
                 {screen === 'event' && currentEvent && (
-                  <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
+                  <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onReorderDay={reorderDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
                 )}
                 {screen === 'day' && currentDay && (
                   <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} showToast={showToast} />
                 )}
                 {screen === 'library' && (
-                  <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} />
+                  <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} onExport={exportData} onImport={importData} />
                 )}
                 {screen === 'summary' && (
                   <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
@@ -826,11 +894,26 @@
     }
 
     // === EVENT DETAIL ===
-    function EventDetail({ event, eventDays, onBack, onOpenDay, onCreateDay, onDeleteDay, onRenameEvent, onDeleteEvent, onInfo }) {
+    function EventDetail({ event, eventDays, onBack, onOpenDay, onCreateDay, onDeleteDay, onReorderDay, onRenameEvent, onDeleteEvent, onInfo }) {
       const [editing, setEditing] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(false);
+      const [sortMode, setSortMode] = useState(() => {
+        try { return localStorage.getItem('tracker:sortMode') || 'day'; } catch { return 'day'; }
+      });
+      useEffect(() => {
+        try { localStorage.setItem('tracker:sortMode', sortMode); } catch {}
+      }, [sortMode]);
       const activeCount = eventDays.filter(d => d.status === 'active').length;
       const totalOut = eventDays.reduce((s, d) => s + (d.dayTotal || 0), 0);
+
+      const sortedDays = useMemo(() => {
+        const arr = [...eventDays];
+        if (sortMode === 'day') return arr.sort((a, b) => ((a.weekNum||0)*100 + (a.dayNum||0)) - ((b.weekNum||0)*100 + (b.dayNum||0)));
+        if (sortMode === 'recent') return arr.sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+        return arr;
+      }, [eventDays, sortMode]);
+
+      const pillCls = (m) => `flex-1 text-[10px] font-data font-bold py-1.5 rounded-md transition active:scale-95 ${sortMode === m ? 'bg-accent-soft text-1 border border-accent' : 'bg-surface-2 text-3 border border-line'}`;
 
       return (
         <div className="max-w-2xl mx-auto px-4 pt-4 pb-32">
@@ -885,9 +968,29 @@
               <p className="text-sm text-3">Tap <b className="text-accent">New Day</b> to start tracking</p>
             </div>
           ) : (
-            <div className="bg-surface border border-line rounded-xl overflow-hidden divide-line">
-              {eventDays.map(d => <DayRow key={d.id} day={d} onClick={() => onOpenDay(d.id)} onDelete={() => onDeleteDay(d.id)} />)}
-            </div>
+            <>
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-[9px] uppercase tracking-widest text-4 font-data font-bold mr-1 shrink-0">Sort</span>
+                <button onClick={() => setSortMode('day')} className={pillCls('day')}>🔢 Day#</button>
+                <button onClick={() => setSortMode('recent')} className={pillCls('recent')}>🕐 Recent</button>
+                <button onClick={() => setSortMode('manual')} className={pillCls('manual')}>✋ Custom</button>
+              </div>
+              <div className="bg-surface border border-line rounded-xl overflow-hidden divide-line">
+                {sortedDays.map((d, i) => (
+                  <DayRow
+                    key={d.id}
+                    day={d}
+                    onClick={() => onOpenDay(d.id)}
+                    onDelete={() => onDeleteDay(d.id)}
+                    showReorder={sortMode === 'manual'}
+                    canMoveUp={i > 0}
+                    canMoveDown={i < sortedDays.length - 1}
+                    onMoveUp={() => onReorderDay(d.id, 'up')}
+                    onMoveDown={() => onReorderDay(d.id, 'down')}
+                  />
+                ))}
+              </div>
+            </>
           )}
 
           <div className="mt-8">
@@ -913,10 +1016,20 @@
       );
     }
 
-    function DayRow({ day, onClick, onDelete }) {
+    function DayRow({ day, onClick, onDelete, showReorder, canMoveUp, canMoveDown, onMoveUp, onMoveDown }) {
       const [confirming, setConfirming] = useState(false);
       return (
-        <div className="px-3 py-2.5 flex items-center gap-2.5 fade-in">
+        <div className="px-3 py-2.5 flex items-center gap-2 fade-in">
+          {showReorder && (
+            <div className="flex flex-col gap-0.5 shrink-0 -ml-1">
+              <button type="button" onClick={onMoveUp} disabled={!canMoveUp} className="p-0.5 text-3 hover:text-accent disabled:opacity-25 disabled:cursor-not-allowed active:scale-90" aria-label="Move up">
+                <ChevronUp className="w-4 h-4" />
+              </button>
+              <button type="button" onClick={onMoveDown} disabled={!canMoveDown} className="p-0.5 text-3 hover:text-accent disabled:opacity-25 disabled:cursor-not-allowed active:scale-90" aria-label="Move down">
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           <button type="button" onClick={onClick} className="flex-1 flex items-center gap-2.5 min-w-0 text-left active:opacity-60">
             <span className={`text-[9px] uppercase tracking-widest font-data font-bold px-1.5 py-0.5 rounded shrink-0 ${day.status === 'active' ? 'bg-accent-soft' : 'bg-status-closed'}`}>
               {day.status === 'active' ? 'LIVE' : 'CLOSED'}
@@ -1051,7 +1164,7 @@
       return (
         <label className="block">
           <span className="text-[8px] uppercase tracking-widest text-4 font-data font-bold">{label}</span>
-          <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="input mt-0.5 w-full rounded-md px-2 py-1 text-xs font-data font-bold placeholder-mute" />
+          <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)} onFocus={e => type === 'number' && e.target.select()} placeholder={placeholder} className="input mt-0.5 w-full rounded-md px-2 py-1 text-xs font-data font-bold placeholder-mute" />
         </label>
       );
     }
@@ -1154,16 +1267,16 @@
               <div className="grid grid-cols-2 gap-1.5 mb-2">
                 <label className="block">
                   <span className="text-[9px] uppercase tracking-widest text-3 font-data font-bold">Starting</span>
-                  <input type="number" inputMode="numeric" value={data.starting || ''} onChange={e => onUpdate({ starting: parseInt(e.target.value) || 0 })} disabled={isClosed} placeholder="0" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
+                  <input type="number" inputMode="numeric" value={data.starting || ''} onChange={e => onUpdate({ starting: parseInt(e.target.value) || 0 })} onFocus={e => e.target.select()} disabled={isClosed} placeholder="0" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
                 </label>
                 <label className="block">
                   <span className="text-[9px] uppercase tracking-widest text-3 font-data font-bold">Leftover</span>
-                  <input type="number" inputMode="numeric" value={lo === null || lo === undefined ? '' : lo} onChange={e => { const v = e.target.value; onUpdate({ leftover: v === '' ? null : parseInt(v) || 0 }); }} disabled={isClosed} placeholder="—" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
+                  <input type="number" inputMode="numeric" value={lo === null || lo === undefined ? '' : lo} onChange={e => { const v = e.target.value; onUpdate({ leftover: v === '' ? null : parseInt(v) || 0 }); }} onFocus={e => e.target.select()} disabled={isClosed} placeholder="—" className="input-2 mt-0.5 w-full rounded-md px-2 py-1.5 text-base font-data font-bold disabled:opacity-60 placeholder-mute" />
                 </label>
               </div>
               {!isClosed && (
                 <div className="flex gap-1.5 mb-2">
-                  <input type="number" inputMode="numeric" value={restockInput} onChange={e => setRestockInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} placeholder="+ stock amount" className="input-2 flex-1 rounded-md px-2 py-1.5 text-xs font-data placeholder-mute" />
+                  <input type="number" inputMode="numeric" value={restockInput} onChange={e => setRestockInput(e.target.value)} onFocus={e => e.target.select()} onKeyDown={e => e.key === 'Enter' && submit()} placeholder="+ stock amount" className="input-2 flex-1 rounded-md px-2 py-1.5 text-xs font-data placeholder-mute" />
                   <button onClick={submit} className="px-3 bg-accent rounded-md font-bold text-xs active:scale-95">+ Stock</button>
                 </div>
               )}
@@ -1199,10 +1312,53 @@
     }
 
     // === LIBRARY ===
-    function Library({ items, onChange, onBack, onEndTour, onInfo, showToast, hasData }) {
+    function Library({ items, onChange, onBack, onEndTour, onInfo, showToast, hasData, onExport, onImport }) {
       const [newItem, setNewItem] = useState('');
       const [editing, setEditing] = useState(null);
       const [confirming, setConfirming] = useState(null);
+      const [pendingImport, setPendingImport] = useState(null);
+      const fileRef = useRef(null);
+
+      const handleExport = async () => {
+        try {
+          const data = await onExport();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const stamp = new Date().toISOString().split('T')[0];
+          a.download = `premium-backup-${stamp}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('📥 Backup downloaded');
+        } catch { showToast('❌ Export failed'); }
+      };
+
+      const handleImportClick = () => fileRef.current?.click();
+
+      const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (!data.version || !data.app) { showToast('❌ Not a valid backup file'); return; }
+          setPendingImport(data);
+        } catch { showToast('❌ Could not read file'); }
+      };
+
+      const handleImportConfirm = async (mode) => {
+        const data = pendingImport;
+        setPendingImport(null);
+        if (!data) return;
+        try {
+          await onImport(data, mode);
+          showToast(mode === 'replace' ? '🔁 Data replaced' : '➕ Data merged');
+        } catch { showToast('❌ Import failed'); }
+      };
 
       const addItem = () => {
         const n = newItem.trim();
@@ -1266,6 +1422,44 @@
 
           {hasData && (
             <div className="mt-8">
+              <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">Backup &amp; Sync</div>
+              <div className="bg-surface border border-line rounded-xl p-3 space-y-2">
+                <button onClick={handleExport} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
+                  <span className="text-xl">📥</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-bold text-sm text-1">Export Data</div>
+                    <div className="text-[11px] text-3 font-data">Download a .json backup of everything</div>
+                  </div>
+                </button>
+                <button onClick={handleImportClick} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
+                  <span className="text-xl">📤</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-bold text-sm text-1">Import Data</div>
+                    <div className="text-[11px] text-3 font-data">Restore from a .json backup file</div>
+                  </div>
+                </button>
+                <input ref={fileRef} type="file" accept="application/json,.json" onChange={handleFileChange} className="hidden" />
+              </div>
+            </div>
+          )}
+          {!hasData && (
+            <div className="mt-8">
+              <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">Backup &amp; Sync</div>
+              <div className="bg-surface border border-line rounded-xl p-3">
+                <button onClick={handleImportClick} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
+                  <span className="text-xl">📤</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-bold text-sm text-1">Import Data</div>
+                    <div className="text-[11px] text-3 font-data">Restore from a .json backup file</div>
+                  </div>
+                </button>
+                <input ref={fileRef} type="file" accept="application/json,.json" onChange={handleFileChange} className="hidden" />
+              </div>
+            </div>
+          )}
+
+          {hasData && (
+            <div className="mt-8">
               <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">End of Tour</div>
               <button onClick={onEndTour} className="w-full summary-gradient border border-line rounded-xl p-4 flex items-center gap-3 active:scale-[0.99]">
                 <div className="text-3xl">🏆</div>
@@ -1280,6 +1474,31 @@
 
           {editing && (
             <EditItemModal item={editing} onClose={() => setEditing(null)} onSave={(name, emoji) => saveEdit(editing.name, name, emoji)} />
+          )}
+
+          {pendingImport && (
+            <Modal onClose={() => setPendingImport(null)}>
+              <h3 className="font-display text-lg font-bold mb-1 text-1">📦 Import Backup</h3>
+              <p className="text-xs text-3 mb-3 font-data">
+                Found <b className="text-1">{pendingImport.events?.length || 0}</b> event{(pendingImport.events?.length || 0) !== 1 ? 's' : ''} with <b className="text-1">{pendingImport.daysIndex?.length || 0}</b> day{(pendingImport.daysIndex?.length || 0) !== 1 ? 's' : ''}.
+                {pendingImport.app && pendingImport.app !== 'tracker' && (<span className="block mt-1 text-amber">⚠️ From "{pendingImport.app}" app — compatible but may differ slightly.</span>)}
+              </p>
+              <p className="text-sm text-2 mb-3">What do you want to do?</p>
+              <div className="space-y-2">
+                <button onClick={() => handleImportConfirm('replace')} className="w-full bg-danger-soft border border-danger rounded-lg p-3 text-left active:scale-[0.99]">
+                  <div className="font-display font-extrabold text-sm text-danger">🔁 Replace All</div>
+                  <div className="text-[11px] text-2 mt-0.5">Wipe current data, restore from backup</div>
+                </button>
+                <button onClick={() => handleImportConfirm('merge')} className="w-full bg-accent-soft border border-accent rounded-lg p-3 text-left active:scale-[0.99]">
+                  <div className="font-display font-extrabold text-sm text-1">➕ Merge In</div>
+                  <div className="text-[11px] text-2 mt-0.5">Keep current data, add events/days from backup that aren't already here</div>
+                </button>
+                <button onClick={() => setPendingImport(null)} className="w-full bg-surface-2 border border-line rounded-lg p-3 text-left active:scale-[0.99]">
+                  <div className="font-display font-extrabold text-sm text-2">❌ Cancel</div>
+                  <div className="text-[11px] text-3 mt-0.5">Don't change anything</div>
+                </button>
+              </div>
+            </Modal>
           )}
         </div>
       );
