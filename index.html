@@ -137,12 +137,15 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
     );
     const Plus = (p) => <Svg {...p}><path d="M5 12h14"/><path d="M12 5v14"/></Svg>;
+    const Minus = (p) => <Svg {...p}><path d="M5 12h14"/></Svg>;
+    const AlertTriangle = (p) => <Svg {...p}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></Svg>;
     const X = (p) => <Svg {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Svg>;
     const Check = (p) => <Svg {...p}><path d="M20 6 9 17l-5-5"/></Svg>;
     const ChevronLeft = (p) => <Svg {...p}><path d="m15 18-6-6 6-6"/></Svg>;
     const ChevronRight = (p) => <Svg {...p}><path d="m9 18 6-6-6-6"/></Svg>;
     const ChevronUp = (p) => <Svg {...p}><path d="m18 15-6-6-6 6"/></Svg>;
     const ChevronDown = (p) => <Svg {...p}><path d="m6 9 6 6 6-6"/></Svg>;
+    const Grip = (p) => <Svg {...p}><line x1="4" x2="14" y1="8" y2="8"/><line x1="4" x2="14" y1="12" y2="12"/><line x1="4" x2="14" y1="16" y2="16"/></Svg>;
     const Lock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></Svg>;
     const Unlock = (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></Svg>;
     const Download = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Svg>;
@@ -273,6 +276,166 @@
     };
     const newId = (p='d') => `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
 
+    // === CITY EMOJI MAP ===
+    const CITY_EMOJI = {
+      'los angeles': '🌴', 'la': '🌴', 'san diego': '🌊', 'san francisco': '🌉', 'sf': '🌉',
+      'sacramento': '🌳', 'oakland': '🌉', 'san jose': '💻', 'anaheim': '🏰', 'long beach': '🏖️',
+      'fresno': '🍇', 'pomona': '🍊', 'pasadena': '🌹', 'palm springs': '🌴', 'berkeley': '🎓',
+      'las vegas': '🎰', 'vegas': '🎰', 'reno': '🎲', 'henderson': '🎰',
+      'phoenix': '🌵', 'tucson': '🌵', 'scottsdale': '🌵', 'mesa': '🌵', 'tempe': '🌵', 'flagstaff': '🏔️',
+      'austin': '🎸', 'houston': '🤠', 'dallas': '🤠', 'san antonio': '🌶️', 'el paso': '🌵',
+      'fort worth': '🐎', 'plano': '🌟', 'arlington': '⚾',
+      'denver': '⛰️', 'boulder': '🏔️', 'colorado springs': '⛰️', 'aspen': '⛷️',
+      'salt lake city': '🏔️', 'slc': '🏔️', 'salt lake': '🏔️', 'park city': '⛷️', 'provo': '🏔️',
+      'seattle': '☕', 'spokane': '🌲', 'tacoma': '🌲', 'bellevue': '🌲',
+      'portland': '🌲', 'eugene': '🌳', 'salem': '🌳',
+      'miami': '🏖️', 'orlando': '🎢', 'tampa': '🌴', 'jacksonville': '🌅',
+      'key west': '🌺', 'fort lauderdale': '🏖️', 'st petersburg': '🌊', 'naples': '🌴',
+      'new york': '🗽', 'nyc': '🗽', 'new york city': '🗽', 'buffalo': '🦬', 'rochester': '🌹',
+      'syracuse': '🌨️', 'albany': '🏛️',
+      'chicago': '🌭', 'springfield': '🏛️',
+      'boston': '🦞', 'cambridge': '🎓', 'worcester': '🦞',
+      'philadelphia': '🔔', 'philly': '🔔', 'pittsburgh': '🏗️', 'harrisburg': '🏛️',
+      'atlanta': '🍑', 'savannah': '🌳', 'augusta': '⛳',
+      'nashville': '🎵', 'memphis': '🎤', 'knoxville': '🦅', 'chattanooga': '🚂',
+      'detroit': '🚗', 'grand rapids': '🌳', 'ann arbor': '🎓',
+      'cleveland': '🎸', 'columbus': '🏟️', 'cincinnati': '🐯', 'toledo': '🏭', 'akron': '🏀',
+      'indianapolis': '🏎️', 'indy': '🏎️', 'bloomington': '🎓',
+      'minneapolis': '❄️', 'st paul': '❄️', 'twin cities': '❄️',
+      'milwaukee': '🍺', 'madison': '🦡', 'green bay': '🧀',
+      'st louis': '🌉', 'kansas city': '🍖', 'springfield mo': '🏛️',
+      'new orleans': '⚜️', 'nola': '⚜️', 'baton rouge': '🐊',
+      'charlotte': '🐝', 'raleigh': '🌳', 'asheville': '🏔️', 'durham': '🎓', 'greensboro': '🌳',
+      'charleston': '🌴', 'columbia sc': '🌳', 'myrtle beach': '🏖️',
+      'virginia beach': '🌊', 'richmond': '🏛️', 'norfolk': '⚓', 'alexandria': '🏛️',
+      'washington': '🏛️', 'dc': '🏛️', 'washington dc': '🏛️', 'washington d.c.': '🏛️',
+      'anchorage': '🐻', 'fairbanks': '❄️', 'juneau': '🏔️',
+      'honolulu': '🌺', 'maui': '🏝️', 'kona': '🌋', 'hilo': '🌋',
+      'oklahoma city': '🌪️', 'okc': '🌪️', 'tulsa': '🛢️',
+      'des moines': '🌽', 'cedar rapids': '🌽',
+      'louisville': '🐎', 'lexington': '🐎',
+      'albuquerque': '🌶️', 'santa fe': '🎨',
+      'baltimore': '🦀', 'annapolis': '⛵',
+      'hartford': '🏛️', 'new haven': '🎓',
+      'newark': '🏙️', 'jersey city': '🏙️', 'atlantic city': '🎰',
+      'wichita': '🌾', 'omaha': '🐂', 'lincoln': '🌽',
+      'sioux falls': '💧', 'fargo': '❄️', 'billings': '🏔️', 'boise': '🥔',
+    };
+
+    function cityEmoji(city) {
+      if (!city) return null;
+      const normalized = city.trim().toLowerCase().split(',')[0].trim();
+      return CITY_EMOJI[normalized] || null;
+    }
+
+    function eventEmoji(event) {
+      return cityEmoji(event?.city) || '📁';
+    }
+
+    // === WEATHER (Open-Meteo, free, no API key) ===
+    const WX_TTL_FUTURE = 6 * 60 * 60 * 1000;
+    const GEO_TTL = 60 * 24 * 60 * 60 * 1000;
+
+    async function geocodeCity(city) {
+      if (!city) return null;
+      const norm = city.trim().toLowerCase();
+      const key = `tracker:geo:${norm}`;
+      try {
+        const cached = JSON.parse(localStorage.getItem(key) || 'null');
+        if (cached && cached.lat != null && Date.now() - (cached.ts || 0) < GEO_TTL) return cached;
+      } catch {}
+      try {
+        const q = city.split(',')[0].trim();
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=en&format=json`);
+        const json = await res.json();
+        const r = json?.results?.[0];
+        if (!r) return null;
+        const data = { lat: r.latitude, lon: r.longitude, name: r.name, ts: Date.now() };
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+        return data;
+      } catch { return null; }
+    }
+
+    async function fetchWeather(lat, lon, date) {
+      if (lat == null || lon == null || !date) return null;
+      const key = `tracker:wx:${lat.toFixed(2)}|${lon.toFixed(2)}|${date}`;
+      const now = Date.now();
+      const today = new Date().toISOString().slice(0, 10);
+      const isPast = date < today;
+      try {
+        const cached = JSON.parse(localStorage.getItem(key) || 'null');
+        if (cached && cached.code != null && (isPast || now - (cached.ts || 0) < WX_TTL_FUTURE)) return cached;
+      } catch {}
+      try {
+        const baseUrl = isPast ? 'https://archive-api.open-meteo.com/v1/archive' : 'https://api.open-meteo.com/v1/forecast';
+        const url = `${baseUrl}?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&start_date=${date}&end_date=${date}&temperature_unit=fahrenheit&timezone=auto`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const t = json?.daily;
+        if (!t || t.temperature_2m_max?.[0] == null) return null;
+        const data = {
+          tmax: Math.round(t.temperature_2m_max[0]),
+          tmin: Math.round(t.temperature_2m_min[0]),
+          code: t.weather_code?.[0] ?? 0,
+          ts: now
+        };
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+        return data;
+      } catch { return null; }
+    }
+
+    function weatherEmoji(code) {
+      if (code === 0) return '☀️';
+      if (code === 1 || code === 2) return '🌤️';
+      if (code === 3) return '☁️';
+      if (code === 45 || code === 48) return '🌫️';
+      if (code >= 51 && code <= 57) return '🌦️';
+      if (code >= 61 && code <= 67) return '🌧️';
+      if (code >= 71 && code <= 77) return '🌨️';
+      if (code >= 80 && code <= 82) return '🌦️';
+      if (code === 85 || code === 86) return '❄️';
+      if (code >= 95 && code <= 99) return '⛈️';
+      return '🌡️';
+    }
+
+    function DayWeather({ city, date }) {
+      const [wx, setWx] = useState(null);
+      useEffect(() => {
+        if (!city || !date) { setWx(null); return; }
+        let cancelled = false;
+        (async () => {
+          const geo = await geocodeCity(city);
+          if (cancelled || !geo) return;
+          const w = await fetchWeather(geo.lat, geo.lon, date);
+          if (!cancelled) setWx(w);
+        })();
+        return () => { cancelled = true; };
+      }, [city, date]);
+      if (!city || !date || !wx) return null;
+      return (
+        <span className="text-[10px] font-data text-3 flex items-center gap-0.5 shrink-0" title={`Forecast for ${date}`}>
+          <span className="text-xs">{weatherEmoji(wx.code)}</span>
+          <span><b className="text-1">{wx.tmax}°</b><span className="text-5">/</span>{wx.tmin}°</span>
+        </span>
+      );
+    }
+
+    function calcSuggestedDeduction(itemInv, unitsPerBox, mode) {
+      if (mode === 'custom') return 0;
+      const inv = itemInv || {};
+      const starting = parseInt(inv.starting) || 0;
+      const restocks = (inv.restocks || []).reduce((s, r) => s + (parseInt(r.amount) || 0), 0);
+      const leftover = inv.leftover;
+      let units = 0;
+      if (mode === 'given_out') {
+        if (leftover === null || leftover === undefined) return 0;
+        units = Math.max(0, starting + restocks - (parseInt(leftover) || 0));
+      } else if (mode === 'pulled') {
+        units = starting + restocks;
+      }
+      return Math.floor(units / Math.max(1, unitsPerBox));
+    }
+
     async function sget(key, fb) { try { const v = localStorage.getItem('tracker:' + key); if (v === null) return fb; return JSON.parse(v); } catch { return fb; }}
     async function sset(key, v) { try { localStorage.setItem('tracker:' + key, JSON.stringify(v)); } catch (e) { console.error(e); }}
     async function sdel(key) { try { localStorage.removeItem('tracker:' + key); } catch {} }
@@ -328,6 +491,8 @@
       const [daysIndex, setDaysIndex] = useState([]);
       const [currentDay, setCurrentDay] = useState(null);
       const [itemsLibrary, setItemsLibrary] = useState([]);
+      const [stockMap, setStockMap] = useState({});
+      const [tourName, setTourName] = useState('');
       const [theme, setTheme] = useState('dark');
       const [showWelcome, setShowWelcome] = useState(false);
       const [showInfo, setShowInfo] = useState(false);
@@ -339,6 +504,10 @@
         let items = await sget('items', null);
         if (!items) { items = DEFAULT_ITEMS; await sset('items', items); }
         setItemsLibrary(items);
+        const sm = await sget('stock', {});
+        setStockMap(sm);
+        const tn = await sget('tourName', '');
+        setTourName(tn || '');
         const ev = await sget('events', []);
         const idx = await sget('idx', []);
         setEvents(ev);
@@ -356,6 +525,50 @@
         }
         setLoading(false);
       })(); }, []);
+
+      // === BROWSER BACK BUTTON (History API) ===
+      const navBackRef = useRef(false);
+      const navMountedRef = useRef(false);
+
+      // Sync screen changes into browser history
+      useEffect(() => {
+        if (loading) return;
+        const state = { screen, currentEventId, currentDayId, _app: 'tracker' };
+        if (!navMountedRef.current) {
+          navMountedRef.current = true;
+          window.history.replaceState(state, '');
+          return;
+        }
+        if (navBackRef.current) {
+          navBackRef.current = false;
+          return;
+        }
+        window.history.pushState(state, '');
+      }, [screen, currentEventId, currentDayId, loading]);
+
+      // Listen for browser back/forward
+      useEffect(() => {
+        const handlePop = async (e) => {
+          if (showInfo) { setShowInfo(false); window.history.pushState({ screen, currentEventId, currentDayId, _app: 'tracker' }, ''); return; }
+          if (showWelcome) { setShowWelcome(false); window.history.pushState({ screen, currentEventId, currentDayId, _app: 'tracker' }, ''); return; }
+          const st = e.state;
+          if (!st || st._app !== 'tracker') {
+            return;
+          }
+          navBackRef.current = true;
+          setCurrentEventId(st.currentEventId ?? null);
+          setCurrentDayId(st.currentDayId ?? null);
+          if ((st.screen === 'day' || st.screen === 'export') && st.currentDayId) {
+            const d = await sget(`d:${st.currentDayId}`, null);
+            if (d) setCurrentDay(d);
+          } else {
+            setCurrentDay(null);
+          }
+          setScreen(st.screen || 'home');
+        };
+        window.addEventListener('popstate', handlePop);
+        return () => window.removeEventListener('popstate', handlePop);
+      }, [screen, currentEventId, currentDayId, showInfo, showWelcome]);
 
       const toggleTheme = async () => {
         const order = ['light', 'dark', 'ocean'];
@@ -458,27 +671,144 @@
         showToast('🗑️ Day deleted');
       };
 
-      const reorderDay = async (dayId, direction) => {
-        const idx = daysIndex.findIndex(d => d.id === dayId);
-        if (idx === -1) return;
-        const eventId = daysIndex[idx].eventId;
-        const myEventDays = daysIndex.filter(d => d.eventId === eventId);
-        const myPos = myEventDays.findIndex(d => d.id === dayId);
-        const swapPos = direction === 'up' ? myPos - 1 : myPos + 1;
-        if (swapPos < 0 || swapPos >= myEventDays.length) return;
-        const swapId = myEventDays[swapPos].id;
-        const swapGlobalIdx = daysIndex.findIndex(d => d.id === swapId);
-        const newIdx = [...daysIndex];
-        [newIdx[idx], newIdx[swapGlobalIdx]] = [newIdx[swapGlobalIdx], newIdx[idx]];
+      const moveDayTo = async (dayId, targetDayId, position) => {
+        // position: 'before' | 'after' — move dayId to be before/after targetDayId
+        if (!dayId || !targetDayId || dayId === targetDayId) return;
+        const dayIdx = daysIndex.findIndex(d => d.id === dayId);
+        if (dayIdx === -1) return;
+        const filtered = daysIndex.filter(d => d.id !== dayId);
+        const targetIdx = filtered.findIndex(d => d.id === targetDayId);
+        if (targetIdx === -1) return;
+        const insertIdx = position === 'before' ? targetIdx : targetIdx + 1;
+        const newIdx = [...filtered.slice(0, insertIdx), daysIndex[dayIdx], ...filtered.slice(insertIdx)];
         await sset('idx', newIdx);
         setDaysIndex(newIdx);
       };
 
-      const updateLibrary = async (next) => { setItemsLibrary(next); await sset('items', next); };
+      const updateLibrary = async (next) => {
+        // Smart sync with stockMap on rename/delete
+        const nextNames = new Set(next.map(i => i.name));
+        let updatedStock = null;
+        if (next.length === itemsLibrary.length) {
+          for (let i = 0; i < next.length; i++) {
+            if (next[i].name !== itemsLibrary[i].name && stockMap[itemsLibrary[i].name]) {
+              if (!updatedStock) updatedStock = { ...stockMap };
+              updatedStock[next[i].name] = updatedStock[itemsLibrary[i].name];
+              delete updatedStock[itemsLibrary[i].name];
+            }
+          }
+        } else if (next.length < itemsLibrary.length) {
+          const removed = itemsLibrary.filter(i => !nextNames.has(i.name));
+          if (removed.some(r => stockMap[r.name])) {
+            updatedStock = { ...stockMap };
+            removed.forEach(r => delete updatedStock[r.name]);
+          }
+        }
+        if (updatedStock) {
+          setStockMap(updatedStock);
+          await sset('stock', updatedStock);
+        }
+        setItemsLibrary(next);
+        await sset('items', next);
+      };
 
-      const exportData = async () => {
+      const updateStock = async (next) => {
+        setStockMap(next);
+        await sset('stock', next);
+      };
+
+      const updateTourName = async (name) => {
+        setTourName(name);
+        await sset('tourName', name);
+      };
+
+      const setItemStockSettings = async (itemName, patch) => {
+        const current = stockMap[itemName] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] };
+        const next = { ...stockMap, [itemName]: { ...current, ...patch } };
+        await updateStock(next);
+      };
+
+      const updateStockHistory = async (itemName, newHistory) => {
+        const current = stockMap[itemName];
+        if (!current) return;
+        const next = { ...stockMap, [itemName]: { ...current, history: newHistory } };
+        await updateStock(next);
+      };
+
+      const changeStock = async (itemName, type, boxes, note) => {
+        const current = stockMap[itemName] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] };
+        let delta = 0;
+        if (type === 'restock' || type === 'adjust-add' || type === 'sync-undo') delta = boxes;
+        else if (type === 'use' || type === 'adjust-sub' || type === 'auto-deduct') delta = -boxes;
+        const newBoxes = Math.max(0, current.boxes + delta);
+        const entry = { ts: new Date().toISOString(), type, boxes, note: note || null };
+        const lastRestockedAt = type === 'restock' ? entry.ts : current.lastRestockedAt;
+        const next = {
+          ...stockMap,
+          [itemName]: {
+            ...current,
+            boxes: newBoxes,
+            lastRestockedAt,
+            history: [entry, ...(current.history || [])].slice(0, 50)
+          }
+        };
+        await updateStock(next);
+      };
+
+      const applyStockSync = async (day, mode, deductions) => {
+        let nextMap = { ...stockMap };
+        const reverseIfNeeded = () => {
+          if (!day.stockSync) return;
+          const undoNote = `Re-sync Day ${day.dayNum} · reverse`;
+          for (const [name, boxes] of Object.entries(day.stockSync.deductions || {})) {
+            if (!boxes || boxes <= 0) continue;
+            const cur = nextMap[name] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] };
+            const entry = { ts: new Date().toISOString(), type: 'sync-undo', boxes, note: undoNote };
+            nextMap[name] = { ...cur, boxes: cur.boxes + boxes, history: [entry, ...(cur.history || [])].slice(0, 50) };
+          }
+        };
+        reverseIfNeeded();
+        const ts = new Date().toISOString();
+        const modeLabel = mode === 'given_out' ? 'given out' : mode === 'pulled' ? 'pulled' : 'custom';
+        const noteBase = `Day ${day.dayNum} sync (${modeLabel})`;
+        for (const [name, boxes] of Object.entries(deductions)) {
+          if (!boxes || boxes <= 0) continue;
+          const cur = nextMap[name] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] };
+          const newBoxes = Math.max(0, cur.boxes - boxes);
+          const entry = { ts, type: 'auto-deduct', boxes, note: noteBase };
+          nextMap[name] = { ...cur, boxes: newBoxes, history: [entry, ...(cur.history || [])].slice(0, 50) };
+        }
+        await updateStock(nextMap);
+        const cleanDeductions = {};
+        for (const [k, v] of Object.entries(deductions)) {
+          if (v && v > 0) cleanDeductions[k] = v;
+        }
+        await saveDay({ ...day, stockSync: { ts, mode, deductions: cleanDeductions } });
+      };
+
+      const undoStockSync = async (day) => {
+        if (!day.stockSync) return;
+        let nextMap = { ...stockMap };
+        const ts = new Date().toISOString();
+        const noteBase = `Undo Day ${day.dayNum} sync`;
+        for (const [name, boxes] of Object.entries(day.stockSync.deductions || {})) {
+          if (!boxes || boxes <= 0) continue;
+          const cur = nextMap[name] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] };
+          const entry = { ts, type: 'sync-undo', boxes, note: noteBase };
+          nextMap[name] = { ...cur, boxes: cur.boxes + boxes, history: [entry, ...(cur.history || [])].slice(0, 50) };
+        }
+        await updateStock(nextMap);
+        const { stockSync, ...rest } = day;
+        await saveDay(rest);
+      };
+
+      const exportData = async (eventIds) => {
+        const idSet = eventIds && eventIds.length > 0 ? new Set(eventIds) : null;
+        const exportEvents = idSet ? events.filter(e => idSet.has(e.id)) : events;
+        const exportEventIds = new Set(exportEvents.map(e => e.id));
+        const exportIdx = daysIndex.filter(d => exportEventIds.has(d.eventId));
         const days = {};
-        for (const di of daysIndex) {
+        for (const di of exportIdx) {
           const day = await sget(`d:${di.id}`, null);
           if (day) days[di.id] = day;
         }
@@ -486,27 +816,34 @@
           version: 1,
           app: 'tracker',
           exportedAt: new Date().toISOString(),
-          events,
-          daysIndex,
+          scope: idSet ? 'events' : 'all',
+          tourName,
+          events: exportEvents,
+          daysIndex: exportIdx,
           itemsLibrary,
+          stockMap,
           days
         };
       };
 
       const importData = async (incoming, mode) => {
         if (mode === 'replace') {
-          const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx' || k === 'tracker:items');
+          const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx' || k === 'tracker:items' || k === 'tracker:stock' || k === 'tracker:tourName');
           keys.forEach(k => localStorage.removeItem(k));
           const newEvents = incoming.events || [];
           const newIdx = incoming.daysIndex || [];
           const newItems = incoming.itemsLibrary || DEFAULT_ITEMS;
+          const newStock = incoming.stockMap || {};
+          const newTourName = incoming.tourName || '';
           await sset('events', newEvents);
           await sset('idx', newIdx);
           await sset('items', newItems);
+          await sset('stock', newStock);
+          await sset('tourName', newTourName);
           for (const [id, day] of Object.entries(incoming.days || {})) {
             await sset(`d:${id}`, day);
           }
-          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems);
+          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems); setStockMap(newStock); setTourName(newTourName);
           setCurrentDay(null); setCurrentDayId(null); setCurrentEventId(null);
           setScreen('home');
         } else if (mode === 'merge') {
@@ -519,19 +856,30 @@
           }
           const existingItemNames = new Set(itemsLibrary.map(i => i.name.toLowerCase()));
           const newItems = [...itemsLibrary, ...((incoming.itemsLibrary || []).filter(i => !existingItemNames.has(i.name.toLowerCase())))];
+          const mergedStock = { ...stockMap };
+          for (const [name, entry] of Object.entries(incoming.stockMap || {})) {
+            if (!mergedStock[name]) mergedStock[name] = entry;
+          }
+          const mergedTourName = tourName || incoming.tourName || '';
           await sset('events', newEvents);
           await sset('idx', newIdx);
           await sset('items', newItems);
-          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems);
+          await sset('stock', mergedStock);
+          if (!tourName && mergedTourName) await sset('tourName', mergedTourName);
+          setEvents(newEvents); setDaysIndex(newIdx); setItemsLibrary(newItems); setStockMap(mergedStock);
+          if (!tourName && mergedTourName) setTourName(mergedTourName);
         }
       };
 
       const startNewTour = async () => {
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:') && (k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx'));
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('tracker:') && (k.startsWith('tracker:d:') || k === 'tracker:events' || k === 'tracker:idx' || k === 'tracker:stock'));
         keys.forEach(k => localStorage.removeItem(k));
         setEvents([]); setDaysIndex([]); setCurrentDay(null); setCurrentDayId(null); setCurrentEventId(null);
+        setStockMap({});
         await sset('items', DEFAULT_ITEMS);
         setItemsLibrary(DEFAULT_ITEMS);
+        await sset('tourName', '');
+        setTourName('');
         setScreen('home');
         showToast('🧹 Fresh start — good luck!');
       };
@@ -562,9 +910,13 @@
                   events={events}
                   daysIndex={daysIndex}
                   currentEventId={currentEventId}
+                  itemsLibrary={itemsLibrary}
+                  stockMap={stockMap}
+                  tourName={tourName}
                   onOpenEvent={openEvent}
                   onCreateEvent={createEvent}
                   onLibrary={() => setScreen('library')}
+                  onStock={() => setScreen('stock')}
                   onInfo={() => setShowInfo(true)}
                   onHome={() => { setScreen('home'); setCurrentEventId(null); setCurrentDay(null); setCurrentDayId(null); }}
                 />
@@ -575,7 +927,7 @@
                 {screen === 'home' && (
                   <>
                     <div className="md:hidden">
-                      <Home events={events} daysIndex={daysIndex} onOpenEvent={openEvent} onCreateEvent={createEvent} onLibrary={() => setScreen('library')} onInfo={() => setShowInfo(true)} onDeleteEvent={deleteEvent} onRenameEvent={renameEvent} />
+                      <Home events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} stockMap={stockMap} tourName={tourName} onOpenEvent={openEvent} onCreateEvent={createEvent} onLibrary={() => setScreen('library')} onStock={() => setScreen('stock')} onInfo={() => setShowInfo(true)} onDeleteEvent={deleteEvent} onRenameEvent={renameEvent} />
                     </div>
                     <div className="hidden md:block">
                       <WidePlaceholder />
@@ -583,16 +935,19 @@
                   </>
                 )}
                 {screen === 'event' && currentEvent && (
-                  <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onReorderDay={reorderDay} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
+                  <EventDetail event={currentEvent} eventDays={eventDays} onBack={() => { setScreen('home'); setCurrentEventId(null); }} onOpenDay={openDay} onCreateDay={() => createDay(currentEventId)} onDeleteDay={deleteDay} onMoveDayTo={moveDayTo} onRenameEvent={(name, city, monthYear) => renameEvent(currentEventId, name, city, monthYear)} onDeleteEvent={() => deleteEvent(currentEventId)} onInfo={() => setShowInfo(true)} />
                 )}
                 {screen === 'day' && currentDay && (
-                  <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} showToast={showToast} />
+                  <DayDetail day={currentDay} event={events.find(e => e.id === currentDay.eventId)} itemsLibrary={itemsLibrary} stockMap={stockMap} onSave={saveDay} onBack={() => { setScreen('event'); setCurrentDay(null); }} onExport={() => setScreen('export')} onInfo={() => setShowInfo(true)} onApplyStockSync={applyStockSync} onUndoStockSync={undoStockSync} showToast={showToast} />
+                )}
+                {screen === 'stock' && (
+                  <StockScreen itemsLibrary={itemsLibrary} stockMap={stockMap} onBack={() => setScreen('home')} onInfo={() => setShowInfo(true)} onChangeStock={changeStock} onSetItemSettings={setItemStockSettings} onUpdateHistory={updateStockHistory} showToast={showToast} />
                 )}
                 {screen === 'library' && (
-                  <Library items={itemsLibrary} onChange={updateLibrary} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} onExport={exportData} onImport={importData} />
+                  <Library items={itemsLibrary} onChange={updateLibrary} tourName={tourName} onTourNameChange={updateTourName} onBack={() => setScreen('home')} onEndTour={() => setScreen('summary')} onInfo={() => setShowInfo(true)} showToast={showToast} hasData={events.length > 0 || daysIndex.length > 0} onExport={exportData} onImport={importData} events={events} daysIndex={daysIndex} />
                 )}
                 {screen === 'summary' && (
-                  <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
+                  <TourSummary events={events} daysIndex={daysIndex} itemsLibrary={itemsLibrary} tourName={tourName} theme={theme} onBack={() => setScreen('library')} onStartNewTour={startNewTour} onInfo={() => setShowInfo(true)} showToast={showToast} />
                 )}
                 {screen === 'export' && currentDay && (
                   <ExportView day={currentDay} itemsLibrary={itemsLibrary} onBack={() => setScreen('day')} onInfo={() => setShowInfo(true)} showToast={showToast} />
@@ -601,7 +956,7 @@
             </div>
 
             {showWelcome && <InfoModal first onClose={dismissWelcome} />}
-            {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+            {showInfo && <InfoModal page={screen} onClose={() => setShowInfo(false)} />}
 
             {toast && (
               <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-3.5 py-2 bg-inverse rounded-full text-xs font-semibold shadow-lg z-50">
@@ -613,28 +968,125 @@
       );
     }
 
+    // === PAGE-SPECIFIC INFO CONTENT ===
+    const PAGE_INFO = {
+      home: {
+        emoji: '🏠',
+        title: 'Home',
+        subtitle: 'Your tour command center',
+        lines: [
+          { e: '➕', t: 'New Event', b: 'Start a new event folder (e.g. "LA County Fair").' },
+          { e: '📁', t: 'Events', b: 'Each card holds the tour days for one event.' },
+          { e: '⚙️', t: 'Settings', b: 'Items library, backup/restore, end of tour.' },
+        ]
+      },
+      event: {
+        emoji: '📁',
+        title: 'Event Days',
+        subtitle: 'Manage days inside this event',
+        lines: [
+          { e: '📅', t: 'New Day', b: 'Adds a tour day so you can track inventory.' },
+          { e: '🔀', t: 'Sort', b: '"Day#", "Recent", or "Custom" (drag the ≡ handle).' },
+          { e: '✏️', t: 'Edit Event', b: 'Pencil icon — rename, change city, set month/year.' },
+          { e: '🌤️', t: 'Weather', b: 'Auto-fetched per day if the event has a city set.' },
+          { e: '🟢', t: 'LIVE / CLOSED', b: 'Tap a day to open. Days are LIVE until you close them.' },
+          { e: '🗑️', t: 'Delete day', b: 'Tap trash, confirm. Event delete is at the bottom.' },
+        ]
+      },
+      day: {
+        emoji: '📋',
+        title: 'Day Tracking',
+        subtitle: 'Log inventory for this day',
+        lines: [
+          { e: '🔢', t: 'Starting', b: 'How many units you started with.' },
+          { e: '🔄', t: 'Restocks', b: 'Mid-day additions get timestamped.' },
+          { e: '📦', t: 'Leftover', b: 'End of day. Auto-calcs Given Out: Starting + Restocks − Leftover.' },
+          { e: '🔒', t: 'Close Out', b: 'Locks the day. Reopen anytime if needed.' },
+          { e: '📤', t: 'Export', b: 'Share the day recap as text or CSV.' },
+        ]
+      },
+      library: {
+        emoji: '⚙️',
+        title: 'Settings & Library',
+        subtitle: 'Items, backups, end of tour',
+        lines: [
+          { e: '✏️', t: 'Items', b: 'Add, rename, or remove items. Each has its own emoji.' },
+          { e: '📥', t: 'Export', b: 'Backup as .json — everything or just selected events.' },
+          { e: '📤', t: 'Import', b: 'Restore .json — replace all, merge, or cancel.' },
+          { e: '🏆', t: 'End Tour', b: 'Generate a shareable end-of-tour summary card.' },
+        ]
+      },
+      stock: {
+        emoji: '📦',
+        title: 'Warehouse Stock',
+        subtitle: 'Box-level inventory across the tour',
+        lines: [
+          { e: '⚙️', t: 'Set up an item', b: 'Tap the gear to configure units-per-box + low threshold.' },
+          { e: '📥', t: 'Restock', b: 'Log boxes received. Sets the "last restocked" date.' },
+          { e: '📤', t: 'Use', b: 'Manually pull boxes from stock.' },
+          { e: '➕➖', t: 'Quick adjust', b: 'Small +/− tweaks for recount or damaged boxes.' },
+          { e: '⚠️', t: 'Low-stock badge', b: 'Items at or below your threshold show a red badge.' },
+          { e: '🔄', t: 'Day → Sync', b: 'On each day, "Sync to Warehouse" auto-deducts boxes based on Given Out / Pulled / Custom math.' },
+          { e: '📋', t: 'History', b: 'Every change is logged. Edit, undo, or clear from each item\'s settings.' },
+        ]
+      },
+      summary: {
+        emoji: '🏆',
+        title: 'Tour Summary',
+        subtitle: 'Your tour recap',
+        lines: [
+          { e: '📊', t: 'Stats', b: 'Days, events, cities, items distributed at a glance.' },
+          { e: '📸', t: 'Save as PNG', b: 'Capture this view as an image for sharing.' },
+          { e: '📋', t: 'Copy text', b: 'Plain-text version for messages or emails.' },
+          { e: '🧹', t: 'Start New Tour', b: 'Reset everything (asks to confirm first).' },
+        ]
+      },
+      export: {
+        emoji: '📤',
+        title: 'Day Export',
+        subtitle: 'Share this day with your team',
+        lines: [
+          { e: '📋', t: 'Recap', b: 'Pre-formatted summary of inventory & restocks.' },
+          { e: '📋', t: 'Copy text', b: 'Tap to copy to clipboard.' },
+          { e: '📊', t: 'CSV', b: 'Spreadsheet-friendly export.' },
+          { e: '🔢', t: 'The math', b: 'Starting + Restocks − Leftover = Given Out.' },
+        ]
+      },
+    };
+
     // === INFO MODAL ===
-    function InfoModal({ first, onClose }) {
+    function InfoModal({ first, page, onClose }) {
       const [dontShow, setDontShow] = useState(false);
       const close = () => first ? onClose(dontShow) : onClose();
+      const info = !first && page && PAGE_INFO[page] ? PAGE_INFO[page] : null;
       return (
         <Modal onClose={close}>
           <div className="text-center mb-3">
-            <div className="text-4xl mb-1">👋</div>
-            <h2 className="font-display text-xl font-extrabold text-1">{first ? 'Welcome to Premium Tracker!' : 'Premium Tracker'}</h2>
-            <p className="text-3 text-xs mt-1">Your tour management sidekick 🚌</p>
+            <div className="text-4xl mb-1">{first ? '👋' : info?.emoji || 'ⓘ'}</div>
+            <h2 className="font-display text-xl font-extrabold text-1">
+              {first ? 'Welcome to Premium Tracker!' : info ? info.title : 'Premium Tracker'}
+            </h2>
+            <p className="text-3 text-xs mt-1">{first ? 'Your tour management sidekick 🚌' : info?.subtitle || ''}</p>
           </div>
           <div className="space-y-1.5 text-xs mb-3 text-2">
-            <InfoLine emoji="📁" t="Events" body="are folders. Each event holds your tour days." />
-            <InfoLine emoji="📅" t="New Day" body="inside an event tracks that day's inventory." />
-            <InfoLine emoji="🔄" t="Restocks" body="logged with timestamps as the day goes." />
-            <InfoLine emoji="🔢" t="Leftover" body="end of day → auto-calcs Given Out." />
-            <InfoLine emoji="🔒" t="Close Out" body="locks the day. Reopen anytime." />
-            <InfoLine emoji="📤" t="Export" body="recap to share with your team." />
-            <InfoLine emoji="🏆" t="End Tour" body="(in Settings ⚙️) → beautiful summary you can share!" />
+            {first ? (
+              <>
+                <InfoLine emoji="📁" t="Events" body="are folders. Each event holds your tour days." />
+                <InfoLine emoji="📅" t="New Day" body="inside an event tracks that day's inventory." />
+                <InfoLine emoji="🔄" t="Restocks" body="logged with timestamps as the day goes." />
+                <InfoLine emoji="🔢" t="Leftover" body="end of day → auto-calcs Given Out." />
+                <InfoLine emoji="🔒" t="Close Out" body="locks the day. Reopen anytime." />
+                <InfoLine emoji="📤" t="Export" body="recap to share with your team." />
+                <InfoLine emoji="🏆" t="End Tour" body="(in Settings ⚙️) → beautiful summary you can share!" />
+              </>
+            ) : (
+              (info || PAGE_INFO.home).lines.map((l, i) => (
+                <InfoLine key={i} emoji={l.e} t={l.t} body={l.b} />
+              ))
+            )}
           </div>
           <p className="text-[11px] text-3 text-center mb-3">
-            ✨ Tap the <b className="text-1">ⓘ</b> button anytime to see this again.
+            {first ? <>✨ Tap the <b className="text-1">ⓘ</b> button on any page for tips about that page.</> : <>✨ Tap the <b className="text-1">ⓘ</b> button anytime for help on any page.</>}
           </p>
           {first && (
             <label className="flex items-center gap-2 text-xs text-2 mb-3 cursor-pointer select-none">
@@ -661,16 +1113,26 @@
     }
 
     // === EVENTS SIDEBAR (foldable / wide screens only) ===
-    function EventsSidebar({ events, daysIndex, currentEventId, onOpenEvent, onCreateEvent, onLibrary, onInfo, onHome }) {
+    function EventsSidebar({ events, daysIndex, currentEventId, itemsLibrary, stockMap, tourName, onOpenEvent, onCreateEvent, onLibrary, onStock, onInfo, onHome }) {
       const [showCreate, setShowCreate] = useState(false);
       const activeEvents = events.filter(e => daysIndex.some(d => d.eventId === e.id && d.status === 'active')).length;
       const totalDays = daysIndex.length;
+      const lowStockCount = (itemsLibrary || []).filter(item => {
+        const s = (stockMap || {})[item.name];
+        return s && s.threshold > 0 && s.boxes <= s.threshold;
+      }).length;
       return (
         <div className="flex flex-col h-full">
           <div className="px-4 pt-5 pb-3 border-b border-line shrink-0">
             <button onClick={onHome} className="text-left mb-3 active:opacity-60 block w-full">
               <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold flex items-center gap-1">🎁 Tour Inventory</div>
               <h1 className="font-display text-2xl font-extrabold leading-tight text-1 flex items-center gap-1.5">Premium<span className="text-accent">.</span></h1>
+              {tourName && (
+                <div className="text-[11px] font-data text-2 mt-1 flex items-center gap-1 truncate">
+                  <span className="text-3">🏷️</span>
+                  <b className="text-1 truncate">{tourName}</b>
+                </div>
+              )}
             </button>
             <div className="flex items-center gap-2 text-xs font-data mb-3 flex-wrap">
               <span><span className="text-4">Events</span> <b className="text-1">{events.length}</b></span>
@@ -682,6 +1144,10 @@
             <div className="flex gap-1.5 mb-2">
               <InfoButton onClick={onInfo} />
               <ThemeToggle />
+              <button onClick={onStock} className="flex-1 p-2 rounded-lg bg-surface border border-line active:scale-95 text-xs font-semibold text-2 flex items-center justify-center gap-1.5 relative">
+                📦 Stock
+                {lowStockCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-[9px] font-data font-bold flex items-center justify-center">{lowStockCount}</span>}
+              </button>
               <button onClick={onLibrary} className="flex-1 p-2 rounded-lg bg-surface border border-line active:scale-95 text-xs font-semibold text-2 flex items-center justify-center gap-1.5">
                 <Settings className="w-3.5 h-3.5" /> Settings
               </button>
@@ -718,7 +1184,7 @@
       return (
         <button onClick={onClick} className={`w-full text-left px-2.5 py-2 rounded-lg transition active:scale-[0.99] ${selected ? 'bg-accent-soft border border-accent' : 'border border-transparent hover:bg-surface'}`}>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-base shrink-0">📁</span>
+            <span className="text-base shrink-0">{eventEmoji(event)}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="font-display font-bold text-sm truncate text-1">{event.name}</span>
@@ -752,34 +1218,58 @@
     }
 
     // === HOME (events list) ===
-    function Home({ events, daysIndex, onOpenEvent, onCreateEvent, onLibrary, onInfo, onDeleteEvent, onRenameEvent }) {
+    function Home({ events, daysIndex, itemsLibrary, stockMap, tourName, onOpenEvent, onCreateEvent, onLibrary, onStock, onInfo, onDeleteEvent, onRenameEvent }) {
       const [showCreate, setShowCreate] = useState(false);
       const [editingEvent, setEditingEvent] = useState(null);
       const activeEvents = events.filter(e => daysIndex.some(d => d.eventId === e.id && d.status === 'active')).length;
       const totalDays = daysIndex.length;
+      const lowStockCount = (itemsLibrary || []).filter(item => {
+        const s = (stockMap || {})[item.name];
+        return s && s.threshold > 0 && s.boxes <= s.threshold;
+      }).length;
+      const trackedCount = (itemsLibrary || []).filter(item => {
+        const s = (stockMap || {})[item.name];
+        return s && (s.boxes > 0 || s.threshold > 0);
+      }).length;
 
       return (
         <div className="max-w-2xl mx-auto px-4 pt-5 pb-32">
           <div className="flex items-center justify-between mb-4">
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold flex items-center gap-1">🎁 Tour Inventory</div>
               <h1 className="font-display text-2xl font-extrabold leading-tight text-1 flex items-center gap-1.5">Premium<span className="text-accent">.</span></h1>
+              {tourName && (
+                <div className="text-[11px] font-data text-2 mt-1 flex items-center gap-1 truncate">
+                  <span className="text-3">🏷️</span>
+                  <b className="text-1 truncate">{tourName}</b>
+                </div>
+              )}
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               <InfoButton onClick={onInfo} />
               <ThemeToggle />
+              <button onClick={onStock} className="p-2 rounded-lg bg-surface border border-line active:scale-95 relative" aria-label="Stock">
+                <span className="text-base">📦</span>
+                {lowStockCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-[9px] font-data font-bold flex items-center justify-center">{lowStockCount}</span>}
+              </button>
               <button onClick={onLibrary} className="p-2 rounded-lg bg-surface border border-line active:scale-95" aria-label="Settings">
                 <Settings className="w-4 h-4 text-3" />
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-data mb-4 px-1">
+          <div className="flex items-center gap-3 text-xs font-data mb-4 px-1 flex-wrap">
             <span><span className="text-4">Events</span> <b className="text-1">{events.length}</b></span>
             <span className="text-5">·</span>
             <span><span className="text-4">Active</span> <b className="text-accent">{activeEvents}</b></span>
             <span className="text-5">·</span>
             <span><span className="text-4">Days</span> <b className="text-amber">{totalDays}</b></span>
+            {trackedCount > 0 && (
+              <>
+                <span className="text-5">·</span>
+                <span><span className="text-4">Stock</span> <b className="text-1">{trackedCount}</b></span>
+              </>
+            )}
           </div>
 
           <button onClick={() => setShowCreate(true)} className="w-full mb-4 bg-inverse font-bold py-3 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.98]">
@@ -821,7 +1311,7 @@
         <div className="bg-surface border border-line rounded-xl overflow-hidden fade-in">
           <div className="px-3 py-3 flex items-center gap-3">
             <button type="button" onClick={onClick} className="flex-1 flex items-center gap-3 min-w-0 text-left active:opacity-60">
-              <div className="text-2xl shrink-0">📁</div>
+              <div className="text-2xl shrink-0">{eventEmoji(event)}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className="font-display font-extrabold text-base truncate text-1">{event.name}</span>
@@ -894,12 +1384,13 @@
     }
 
     // === EVENT DETAIL ===
-    function EventDetail({ event, eventDays, onBack, onOpenDay, onCreateDay, onDeleteDay, onReorderDay, onRenameEvent, onDeleteEvent, onInfo }) {
+    function EventDetail({ event, eventDays, onBack, onOpenDay, onCreateDay, onDeleteDay, onMoveDayTo, onRenameEvent, onDeleteEvent, onInfo }) {
       const [editing, setEditing] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(false);
       const [sortMode, setSortMode] = useState(() => {
         try { return localStorage.getItem('tracker:sortMode') || 'day'; } catch { return 'day'; }
       });
+      const [draggingId, setDraggingId] = useState(null);
       useEffect(() => {
         try { localStorage.setItem('tracker:sortMode', sortMode); } catch {}
       }, [sortMode]);
@@ -915,6 +1406,29 @@
 
       const pillCls = (m) => `flex-1 text-[10px] font-data font-bold py-1.5 rounded-md transition active:scale-95 ${sortMode === m ? 'bg-accent-soft text-1 border border-accent' : 'bg-surface-2 text-3 border border-line'}`;
 
+      // === Drag-and-drop handlers ===
+      const handleDragStart = (e, dayId) => {
+        e.preventDefault();
+        setDraggingId(dayId);
+        try { e.target.setPointerCapture(e.pointerId); } catch {}
+      };
+      const handleDragMove = (e) => {
+        if (!draggingId) return;
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        if (!el) return;
+        const row = el.closest('[data-dayid]');
+        if (!row) return;
+        const overId = row.dataset.dayid;
+        if (!overId || overId === draggingId) return;
+        const rect = row.getBoundingClientRect();
+        const position = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+        onMoveDayTo(draggingId, overId, position);
+      };
+      const handleDragEnd = (e) => {
+        setDraggingId(null);
+        try { e.target.releasePointerCapture(e.pointerId); } catch {}
+      };
+
       return (
         <div className="max-w-2xl mx-auto px-4 pt-4 pb-32">
           <div className="flex items-center justify-between mb-3">
@@ -929,7 +1443,7 @@
 
           <div className="mb-4">
             <div className="flex items-start gap-2 mb-1">
-              <div className="text-3xl">📁</div>
+              <div className="text-3xl">{eventEmoji(event)}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="font-display text-2xl font-extrabold leading-tight text-1 truncate">{event.name}</h1>
@@ -980,13 +1494,14 @@
                   <DayRow
                     key={d.id}
                     day={d}
+                    city={event.city}
                     onClick={() => onOpenDay(d.id)}
                     onDelete={() => onDeleteDay(d.id)}
-                    showReorder={sortMode === 'manual'}
-                    canMoveUp={i > 0}
-                    canMoveDown={i < sortedDays.length - 1}
-                    onMoveUp={() => onReorderDay(d.id, 'up')}
-                    onMoveDown={() => onReorderDay(d.id, 'down')}
+                    showDrag={sortMode === 'manual'}
+                    isDragging={draggingId === d.id}
+                    onDragStart={(e) => handleDragStart(e, d.id)}
+                    onDragMove={handleDragMove}
+                    onDragEnd={handleDragEnd}
                   />
                 ))}
               </div>
@@ -1016,27 +1531,34 @@
       );
     }
 
-    function DayRow({ day, onClick, onDelete, showReorder, canMoveUp, canMoveDown, onMoveUp, onMoveDown }) {
+    function DayRow({ day, city, onClick, onDelete, showDrag, isDragging, onDragStart, onDragMove, onDragEnd }) {
       const [confirming, setConfirming] = useState(false);
       return (
-        <div className="px-3 py-2.5 flex items-center gap-2 fade-in">
-          {showReorder && (
-            <div className="flex flex-col gap-0.5 shrink-0 -ml-1">
-              <button type="button" onClick={onMoveUp} disabled={!canMoveUp} className="p-0.5 text-3 hover:text-accent disabled:opacity-25 disabled:cursor-not-allowed active:scale-90" aria-label="Move up">
-                <ChevronUp className="w-4 h-4" />
-              </button>
-              <button type="button" onClick={onMoveDown} disabled={!canMoveDown} className="p-0.5 text-3 hover:text-accent disabled:opacity-25 disabled:cursor-not-allowed active:scale-90" aria-label="Move down">
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
+        <div data-dayid={day.id} className={`px-3 py-2.5 flex items-center gap-2 fade-in transition ${isDragging ? 'bg-accent-soft ring-2 ring-accent shadow-xl relative z-10 scale-[1.02]' : ''}`}>
+          {showDrag && (
+            <button
+              type="button"
+              onPointerDown={onDragStart}
+              onPointerMove={onDragMove}
+              onPointerUp={onDragEnd}
+              onPointerCancel={onDragEnd}
+              className="p-1.5 -ml-1 text-3 active:text-accent cursor-grab touch-none select-none"
+              aria-label="Drag to reorder"
+              style={{ touchAction: 'none' }}
+            >
+              <Grip className="w-4 h-4" />
+            </button>
           )}
           <button type="button" onClick={onClick} className="flex-1 flex items-center gap-2.5 min-w-0 text-left active:opacity-60">
             <span className={`text-[9px] uppercase tracking-widest font-data font-bold px-1.5 py-0.5 rounded shrink-0 ${day.status === 'active' ? 'bg-accent-soft' : 'bg-status-closed'}`}>
               {day.status === 'active' ? 'LIVE' : 'CLOSED'}
             </span>
             <div className="flex-1 min-w-0">
-              <div className="font-display font-bold text-sm leading-tight text-1">
-                Week {day.weekNum} · Day {day.dayNum}
+              <div className="flex items-center justify-between gap-2">
+                <div className="font-display font-bold text-sm leading-tight text-1 truncate">
+                  Week {day.weekNum} · Day {day.dayNum}
+                </div>
+                <DayWeather city={city} date={day.date} />
               </div>
               <div className="text-[11px] text-3 font-data leading-tight">{dateNice(day.date)}{day.status === 'closed' ? ` · ${day.dayTotal || 0} out` : ''}</div>
             </div>
@@ -1057,9 +1579,11 @@
     }
 
     // === DAY DETAIL ===
-    function DayDetail({ day, event, itemsLibrary, onSave, onBack, onExport, onInfo, showToast }) {
+    function DayDetail({ day, event, itemsLibrary, stockMap, onSave, onBack, onExport, onInfo, onApplyStockSync, onUndoStockSync, showToast }) {
       const [editHeader, setEditHeader] = useState(false);
       const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+      const [showSyncModal, setShowSyncModal] = useState(false);
+      const [showUndoConfirm, setShowUndoConfirm] = useState(false);
       const update = (patch) => onSave({ ...day, ...patch });
       const isClosed = day.status === 'closed';
       const closeDay = async () => { await onSave({ ...day, status: 'closed', closedAt: new Date().toISOString() }); setShowCloseConfirm(false); showToast('🔒 Closed'); };
@@ -1101,11 +1625,12 @@
             ) : (
               <div className="flex items-center justify-between gap-2">
                 <button onClick={() => !isClosed && setEditHeader(true)} className="text-left flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
+                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                     <span className={`text-[9px] uppercase tracking-widest font-data font-bold px-1.5 py-0.5 rounded ${isClosed ? 'bg-status-closed' : 'bg-accent-soft'}`}>
                       {isClosed ? '🔒 CLOSED' : '🟢 LIVE'}
                     </span>
                     <span className="text-[10px] text-3 font-data">{dateNice(day.date)}</span>
+                    {event?.city && <DayWeather city={event.city} date={day.date} />}
                   </div>
                   <div className="font-display font-extrabold text-lg leading-tight text-1">
                     Week {day.weekNum} · Day {day.dayNum}
@@ -1122,6 +1647,11 @@
           <SectionLabel emoji="📦" title="Inventory" count={day.activeItems.length} />
           <InventoryGrid day={day} itemsLibrary={itemsLibrary} update={update} isClosed={isClosed} showToast={showToast} />
 
+          <div className="mt-4">
+            <SectionLabel emoji="📦" title="Warehouse Sync" />
+            <SyncStatusCard day={day} stockMap={stockMap || {}} onOpenSync={() => setShowSyncModal(true)} onUndoSync={() => setShowUndoConfirm(true)} />
+          </div>
+
           <div className="mt-6">
             {isClosed ? (
               <button onClick={reopenDay} className="w-full bg-surface border border-line text-1 font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
@@ -1133,6 +1663,34 @@
               </button>
             )}
           </div>
+
+          {showSyncModal && (
+            <SyncToWarehouseModal
+              day={day}
+              itemsLibrary={itemsLibrary}
+              stockMap={stockMap || {}}
+              onClose={() => setShowSyncModal(false)}
+              onApply={async (mode, deductions) => {
+                await onApplyStockSync(day, mode, deductions);
+                setShowSyncModal(false);
+                const total = Object.values(deductions).reduce((s, b) => s + (b || 0), 0);
+                showToast(`📦 Synced · ${total} ${total === 1 ? 'box' : 'boxes'}`);
+              }}
+            />
+          )}
+          {showUndoConfirm && (
+            <Modal onClose={() => setShowUndoConfirm(false)}>
+              <div className="text-center">
+                <div className="text-3xl mb-2">↩️</div>
+                <h3 className="font-display text-lg font-bold mb-1 text-1">Undo this sync?</h3>
+                <p className="text-3 text-xs mb-4">The deducted boxes will be added back to warehouse stock.</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowUndoConfirm(false)} className="flex-1 bg-surface-2 text-2 font-semibold py-2 rounded-md text-sm border border-line">Cancel</button>
+                  <button onClick={async () => { setShowUndoConfirm(false); await onUndoStockSync(day); showToast('↩️ Sync undone'); }} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm">Undo</button>
+                </div>
+              </div>
+            </Modal>
+          )}
 
           {showCloseConfirm && (
             <Modal onClose={() => setShowCloseConfirm(false)}>
@@ -1312,28 +1870,859 @@
     }
 
     // === LIBRARY ===
-    function Library({ items, onChange, onBack, onEndTour, onInfo, showToast, hasData, onExport, onImport }) {
+    function StockScreen({ itemsLibrary, stockMap, onBack, onInfo, onChangeStock, onSetItemSettings, onUpdateHistory, showToast }) {
+      const [restocking, setRestocking] = useState(null);
+      const [usingItem, setUsingItem] = useState(null);
+      const [setupItem, setSetupItem] = useState(null);
+
+      const itemsWithStock = (itemsLibrary || []).map(item => ({
+        ...item,
+        stock: (stockMap || {})[item.name] || { boxes: 0, unitsPerBox: 1, threshold: 0, notes: '', history: [] }
+      }));
+
+      const isLow = (item) => item.stock.threshold > 0 && item.stock.boxes <= item.stock.threshold;
+      const lowItems = itemsWithStock.filter(isLow);
+      const okItems = itemsWithStock.filter(i => !isLow(i));
+
+      const totalBoxes = itemsWithStock.reduce((s, i) => s + (i.stock.boxes || 0), 0);
+      const totalUnits = itemsWithStock.reduce((s, i) => s + (i.stock.boxes || 0) * (i.stock.unitsPerBox || 1), 0);
+
+      return (
+        <div className="max-w-2xl mx-auto px-4 pt-4 pb-32">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={onBack} className="flex items-center gap-1 text-3 active:scale-95">
+              <ChevronLeft className="w-4 h-4" /><span className="text-xs">Home</span>
+            </button>
+            <div className="flex items-center gap-1.5">
+              <InfoButton onClick={onInfo} />
+              <ThemeToggle />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="text-[10px] font-data uppercase tracking-[0.25em] text-accent font-bold flex items-center gap-1">📦 Inventory</div>
+            <h1 className="font-display text-2xl font-extrabold leading-tight text-1">Warehouse Stock</h1>
+            <p className="text-3 text-xs mt-1">Track boxes on hand. Low-stock items get a ⚠️ badge.</p>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-data mb-4 px-1 flex-wrap">
+            <span><span className="text-4">Boxes</span> <b className="text-1">{totalBoxes}</b></span>
+            <span className="text-5">·</span>
+            <span><span className="text-4">Units</span> <b className="text-amber">{totalUnits.toLocaleString()}</b></span>
+            {lowItems.length > 0 && (
+              <>
+                <span className="text-5">·</span>
+                <span className="text-danger font-bold flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {lowItems.length} low</span>
+              </>
+            )}
+          </div>
+
+          {itemsWithStock.some(i => i.stock.boxes > 0) && (
+            <div className="bg-surface border border-line rounded-xl p-3 mb-4">
+              <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-line">
+                <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold">📊 On Hand By Item</div>
+                <div className="flex items-center gap-1.5 text-[9px] font-data text-3 uppercase tracking-widest font-bold">
+                  <span>Boxes</span>
+                  <span className="text-5">/</span>
+                  <span>Units</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                {itemsWithStock.filter(i => i.stock.boxes > 0).map(item => {
+                  const u = item.stock.boxes * (item.stock.unitsPerBox || 1);
+                  return (
+                    <div key={item.name} className="flex items-center gap-2 text-xs font-data">
+                      <span className="text-base shrink-0">{item.emoji}</span>
+                      <span className="flex-1 truncate text-2">{item.name}</span>
+                      <span className="font-bold text-1 tabular-nums">{item.stock.boxes}</span>
+                      <span className="text-5">/</span>
+                      <span className="font-bold text-amber tabular-nums">{u.toLocaleString()}</span>
+                    </div>
+                  );
+                })}
+                <div className="flex items-center gap-2 text-xs font-data pt-1.5 mt-1.5 border-t border-line">
+                  <span className="text-base shrink-0">📦</span>
+                  <span className="flex-1 font-display font-extrabold text-1">Total</span>
+                  <span className="font-extrabold text-1 tabular-nums">{totalBoxes}</span>
+                  <span className="text-5">/</span>
+                  <span className="font-extrabold text-amber tabular-nums">{totalUnits.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {itemsLibrary.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-line rounded-xl">
+              <div className="text-3xl mb-1">📦</div>
+              <p className="text-sm text-3">No items in your library yet.</p>
+              <p className="text-xs text-4 mt-2">Add items in <b className="text-accent">Settings → Library</b> first.</p>
+            </div>
+          ) : (
+            <>
+              {lowItems.length > 0 && (
+                <>
+                  <div className="text-[10px] font-data uppercase tracking-[0.25em] text-danger font-bold mb-2 px-1 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> Low Stock
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    {lowItems.map(item => (
+                      <StockItemCard
+                        key={item.name}
+                        item={item}
+                        isLow={true}
+                        onDelta={(d) => onChangeStock(item.name, d > 0 ? 'adjust-add' : 'adjust-sub', Math.abs(d))}
+                        onRestock={() => setRestocking(item)}
+                        onUse={() => setUsingItem(item)}
+                        onSetup={() => setSetupItem(item)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {okItems.length > 0 && (
+                <>
+                  <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">
+                    {lowItems.length > 0 ? 'All Other Items' : 'Items'}
+                  </div>
+                  <div className="space-y-2">
+                    {okItems.map(item => (
+                      <StockItemCard
+                        key={item.name}
+                        item={item}
+                        isLow={false}
+                        onDelta={(d) => onChangeStock(item.name, d > 0 ? 'adjust-add' : 'adjust-sub', Math.abs(d))}
+                        onRestock={() => setRestocking(item)}
+                        onUse={() => setUsingItem(item)}
+                        onSetup={() => setSetupItem(item)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {restocking && (
+            <StockChangeModal
+              mode="restock"
+              item={restocking}
+              onClose={() => setRestocking(null)}
+              onSave={(boxes, note) => { onChangeStock(restocking.name, 'restock', boxes, note); setRestocking(null); showToast(`📥 +${boxes} ${restocking.name}`); }}
+            />
+          )}
+          {usingItem && (
+            <StockChangeModal
+              mode="use"
+              item={usingItem}
+              onClose={() => setUsingItem(null)}
+              onSave={(boxes, note) => { onChangeStock(usingItem.name, 'use', boxes, note); setUsingItem(null); showToast(`📤 -${boxes} ${usingItem.name}`); }}
+            />
+          )}
+          {setupItem && (
+            <StockSetupModal
+              item={{ ...setupItem, stock: (stockMap || {})[setupItem.name] || setupItem.stock }}
+              onClose={() => setSetupItem(null)}
+              onSave={(unitsPerBox, threshold, notes) => { onSetItemSettings(setupItem.name, { unitsPerBox, threshold, notes }); setSetupItem(null); showToast(`⚙️ Updated ${setupItem.name}`); }}
+              onUpdateHistory={(newHist) => onUpdateHistory(setupItem.name, newHist)}
+              showToast={showToast}
+            />
+          )}
+        </div>
+      );
+    }
+
+    function StockItemCard({ item, isLow, onDelta, onRestock, onUse, onSetup }) {
+      const { stock } = item;
+      const units = (stock.boxes || 0) * (stock.unitsPerBox || 1);
+      const lastDate = stock.lastRestockedAt ? (() => { try { return new Date(stock.lastRestockedAt).toLocaleDateString([], { month: 'short', day: 'numeric' }); } catch { return null; } })() : null;
+      return (
+        <div className={`bg-surface rounded-xl p-3 border ${isLow ? 'border-danger' : 'border-line'}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl shrink-0">{item.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="font-display font-extrabold text-base text-1 truncate">{item.name}</div>
+              <div className="text-[10px] text-3 font-data flex items-center gap-1 flex-wrap">
+                <span>{(stock.unitsPerBox || 1)}/box</span>
+                {stock.threshold > 0 && <><span className="text-5">·</span><span>low ≤ {stock.threshold}</span></>}
+                {lastDate && <><span className="text-5">·</span><span>last {lastDate}</span></>}
+              </div>
+            </div>
+            <button onClick={onSetup} className="p-1.5 text-4 hover:text-accent active:scale-90" aria-label="Settings">
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 mb-2">
+            <button onClick={() => onDelta(-1)} disabled={stock.boxes === 0} className="w-12 h-12 rounded-lg bg-surface-2 border border-line text-1 active:scale-95 disabled:opacity-30 flex items-center justify-center">
+              <Minus className="w-5 h-5" strokeWidth={3} />
+            </button>
+            <div className="flex-1 text-center bg-surface-2 border border-line rounded-lg py-1.5">
+              <div className="font-display text-3xl font-extrabold leading-none text-1">{stock.boxes || 0}</div>
+              <div className="text-[9px] text-3 font-data uppercase tracking-wider leading-tight mt-0.5">
+                {stock.boxes === 1 ? 'box' : 'boxes'} · {units.toLocaleString()} units
+              </div>
+            </div>
+            <button onClick={() => onDelta(1)} className="w-12 h-12 rounded-lg bg-accent-soft border border-accent text-1 active:scale-95 flex items-center justify-center">
+              <Plus className="w-5 h-5" strokeWidth={3} />
+            </button>
+          </div>
+
+          {isLow && (
+            <div className="bg-danger-soft border border-danger text-danger rounded-md px-2 py-1 text-[10px] font-data font-bold mb-2 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" /> Reorder soon
+            </div>
+          )}
+
+          {stock.notes && (
+            <div className="text-[10px] text-3 font-data bg-surface-2 rounded-md px-2 py-1 mb-2 italic">📝 {stock.notes}</div>
+          )}
+
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={onRestock} className="bg-surface-2 border border-line rounded-md py-2 text-xs font-semibold text-1 active:scale-95 flex items-center justify-center gap-1.5">
+              📥 Restock
+            </button>
+            <button onClick={onUse} disabled={stock.boxes === 0} className="bg-surface-2 border border-line rounded-md py-2 text-xs font-semibold text-1 active:scale-95 disabled:opacity-40 flex items-center justify-center gap-1.5">
+              📤 Use
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function StockChangeModal({ mode, item, onClose, onSave }) {
+      const [amount, setAmount] = useState('');
+      const [note, setNote] = useState('');
+      const isRestock = mode === 'restock';
+      const n = parseInt(amount) || 0;
+      const valid = n > 0 && (isRestock || n <= (item.stock.boxes || 0));
+      const submit = () => { if (valid) onSave(n, note.trim() || null); };
+      return (
+        <Modal onClose={onClose}>
+          <h3 className="font-display text-lg font-bold mb-1 text-1">
+            {isRestock ? '📥 Restock' : '📤 Use'} {item.emoji} {item.name}
+          </h3>
+          <p className="text-xs text-3 mb-3 font-data">
+            Currently <b className="text-1">{item.stock.boxes || 0}</b> {(item.stock.boxes === 1) ? 'box' : 'boxes'} on hand.
+          </p>
+          <div className="space-y-2 mb-3">
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">{isRestock ? 'Boxes received' : 'Boxes used'}</span>
+              <input type="number" inputMode="numeric" value={amount} onChange={e => setAmount(e.target.value)} onFocus={e => e.target.select()} onKeyDown={e => e.key === 'Enter' && submit()} autoFocus placeholder="0" className="input mt-0.5 w-full rounded-md px-3 py-2 text-base font-data font-bold placeholder-mute" />
+              {!isRestock && n > (item.stock.boxes || 0) && (
+                <div className="text-[10px] text-danger font-data mt-1">⚠️ More than on hand — limit is {item.stock.boxes || 0}.</div>
+              )}
+            </label>
+            <label className="block">
+              <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Note <span className="text-4 normal-case tracking-normal">(optional)</span></span>
+              <input value={note} onChange={e => setNote(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} placeholder={isRestock ? "e.g. Order #1234, shipment from HQ" : "e.g. Damaged box, recount"} className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute" />
+            </label>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="flex-1 bg-surface-2 border border-line text-2 font-semibold py-2 rounded-md text-sm">Cancel</button>
+            <button onClick={submit} disabled={!valid} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm disabled:opacity-40">
+              {isRestock ? `📥 Add ${n || ''}` : `📤 Remove ${n || ''}`}
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    function StockSetupModal({ item, onClose, onSave, onUpdateHistory, showToast }) {
+      const [tab, setTab] = useState('settings');
+      const [unitsPerBox, setUnitsPerBox] = useState(item.stock.unitsPerBox || 1);
+      const [threshold, setThreshold] = useState(item.stock.threshold || 0);
+      const [notes, setNotes] = useState(item.stock.notes || '');
+      const [confirmDelete, setConfirmDelete] = useState(null);
+      const [undoStack, setUndoStack] = useState([]);
+      const history = item.stock.history || [];
+      const submit = () => {
+        const upb = Math.max(1, parseInt(unitsPerBox) || 1);
+        const thr = Math.max(0, parseInt(threshold) || 0);
+        onSave(upb, thr, notes.trim());
+      };
+
+      const doDeleteOne = (index) => {
+        const entry = history[index];
+        const newHistory = history.filter((_, i) => i !== index);
+        setUndoStack([...undoStack, [{ entry, index }]]);
+        onUpdateHistory(newHistory);
+        setConfirmDelete(null);
+        showToast && showToast('🗑️ Entry deleted · Undo available');
+      };
+      const doDeleteAll = () => {
+        if (history.length === 0) return;
+        const saved = history.map((entry, index) => ({ entry, index }));
+        setUndoStack([...undoStack, saved]);
+        onUpdateHistory([]);
+        setConfirmDelete(null);
+        showToast && showToast(`🗑️ Cleared ${saved.length} · Undo available`);
+      };
+      const doUndo = () => {
+        if (undoStack.length === 0) return;
+        const last = undoStack[undoStack.length - 1];
+        const restored = [...history];
+        const sorted = [...last].sort((a, b) => a.index - b.index);
+        for (const { entry, index } of sorted) {
+          restored.splice(Math.min(index, restored.length), 0, entry);
+        }
+        setUndoStack(undoStack.slice(0, -1));
+        onUpdateHistory(restored);
+        showToast && showToast('↩️ Restored');
+      };
+
+      const labelForType = (t) => {
+        if (t === 'restock') return { e: '📥', txt: 'Restocked', color: 'text-accent' };
+        if (t === 'use') return { e: '📤', txt: 'Used', color: 'text-amber' };
+        if (t === 'auto-deduct') return { e: '🤖', txt: 'Day sync', color: 'text-amber' };
+        if (t === 'sync-undo') return { e: '↩️', txt: 'Sync undone', color: 'text-accent' };
+        if (t === 'adjust-add') return { e: '➕', txt: 'Adjusted +', color: 'text-2' };
+        if (t === 'adjust-sub') return { e: '➖', txt: 'Adjusted −', color: 'text-2' };
+        return { e: '✏️', txt: 'Changed', color: 'text-2' };
+      };
+      const formatTs = (ts) => {
+        try {
+          const d = new Date(ts);
+          const date = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+          const time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+          return `${date} · ${time}`;
+        } catch { return ts; }
+      };
+      return (
+        <Modal onClose={onClose}>
+          <h3 className="font-display text-lg font-bold mb-2 text-1">
+            ⚙️ Set up {item.emoji} {item.name}
+          </h3>
+          <div className="flex gap-1 mb-3 bg-surface-2 border border-line rounded-lg p-1">
+            <button onClick={() => setTab('settings')} className={`flex-1 py-1.5 rounded-md text-xs font-display font-bold transition ${tab === 'settings' ? 'bg-accent-soft text-1 border border-accent' : 'text-3'}`}>
+              ⚙️ Settings
+            </button>
+            <button onClick={() => setTab('history')} className={`flex-1 py-1.5 rounded-md text-xs font-display font-bold transition ${tab === 'history' ? 'bg-accent-soft text-1 border border-accent' : 'text-3'}`}>
+              📋 History {history.length > 0 && <span className="text-[9px] font-data ml-1 text-4">({history.length})</span>}
+            </button>
+          </div>
+
+          {tab === 'settings' && (
+            <>
+              <div className="space-y-2 mb-3">
+                <label className="block">
+                  <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Units per box</span>
+                  <input type="number" inputMode="numeric" value={unitsPerBox} onChange={e => setUnitsPerBox(e.target.value)} onFocus={e => e.target.select()} placeholder="1" className="input mt-0.5 w-full rounded-md px-3 py-2 text-base font-data font-bold placeholder-mute" />
+                  <div className="text-[10px] text-3 font-data mt-1">e.g. 50 T-shirts per box. Use <b>1</b> if you track loose units.</div>
+                </label>
+                <label className="block">
+                  <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Low-stock threshold</span>
+                  <input type="number" inputMode="numeric" value={threshold} onChange={e => setThreshold(e.target.value)} onFocus={e => e.target.select()} placeholder="0" className="input mt-0.5 w-full rounded-md px-3 py-2 text-base font-data font-bold placeholder-mute" />
+                  <div className="text-[10px] text-3 font-data mt-1">Warn when boxes ≤ this number. Set <b>0</b> to disable warnings.</div>
+                </label>
+                <label className="block">
+                  <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Notes <span className="text-4 normal-case tracking-normal">(optional)</span></span>
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Big & Tall sizes stored in main warehouse" rows={2} className="input mt-0.5 w-full rounded-md px-3 py-2 text-sm placeholder-mute resize-none" />
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={onClose} className="flex-1 bg-surface-2 border border-line text-2 font-semibold py-2 rounded-md text-sm">Cancel</button>
+                <button onClick={submit} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm">Save</button>
+              </div>
+            </>
+          )}
+
+          {tab === 'history' && (
+            <>
+              {(undoStack.length > 0 || history.length > 0) && (
+                <div className="flex items-center gap-2 mb-2">
+                  {undoStack.length > 0 && (
+                    <button onClick={doUndo} className="flex-1 bg-accent-soft border border-accent text-1 font-bold py-1.5 rounded-md text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                      ↩️ Undo last delete
+                    </button>
+                  )}
+                  {history.length > 0 && (
+                    <button onClick={() => setConfirmDelete({ kind: 'all' })} className="flex-1 bg-surface-2 border border-line text-3 font-semibold py-1.5 rounded-md text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                      🗑️ Clear all
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="max-h-[50vh] overflow-y-auto -mx-1 px-1">
+                {history.length === 0 ? (
+                  <div className="text-center py-8 text-3 text-xs">
+                    <div className="text-3xl mb-2">📋</div>
+                    <p>{undoStack.length > 0 ? 'All entries cleared.' : 'No history yet.'}</p>
+                    <p className="text-4 mt-1 text-[10px]">{undoStack.length > 0 ? 'Tap Undo above to restore.' : 'Restocks, uses, and adjustments appear here.'}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {history.map((h, i) => {
+                      const meta = labelForType(h.type);
+                      return (
+                        <div key={`${h.ts}-${i}`} className="bg-surface-2 border border-line rounded-lg p-2.5 flex items-start gap-2">
+                          <span className="text-lg shrink-0">{meta.e}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`font-display font-bold text-xs ${meta.color}`}>{meta.txt}</span>
+                              <span className="font-data font-extrabold text-sm text-1">
+                                {(h.type === 'use' || h.type === 'auto-deduct' || h.type === 'adjust-sub') ? '−' : '+'}{h.boxes} box{h.boxes !== 1 ? 'es' : ''}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-3 font-data">{formatTs(h.ts)}</div>
+                            {h.note && <div className="text-[11px] text-2 italic mt-0.5">📝 {h.note}</div>}
+                          </div>
+                          <button onClick={() => setConfirmDelete({ kind: 'one', index: i })} className="shrink-0 w-7 h-7 rounded-md bg-surface border border-line text-4 active:scale-95 flex items-center justify-center" aria-label="Delete entry">
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <button onClick={onClose} className="w-full mt-3 bg-inverse font-bold py-2 rounded-md text-sm">Done</button>
+
+              {confirmDelete && (
+                <Modal onClose={() => setConfirmDelete(null)}>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">🗑️</div>
+                    <h3 className="font-display text-lg font-bold mb-1 text-1">
+                      {confirmDelete.kind === 'all' ? `Clear all ${history.length} entries?` : 'Delete this entry?'}
+                    </h3>
+                    <p className="text-3 text-xs mb-4">
+                      {confirmDelete.kind === 'all'
+                        ? 'All history will be removed. You can still tap Undo right after.'
+                        : 'Removes this one entry. You can still tap Undo right after.'}
+                    </p>
+                    <div className="flex gap-2">
+                      <button onClick={() => setConfirmDelete(null)} className="flex-1 bg-surface-2 border border-line text-2 font-semibold py-2 rounded-md text-sm">Cancel</button>
+                      <button onClick={() => confirmDelete.kind === 'all' ? doDeleteAll() : doDeleteOne(confirmDelete.index)} className="flex-1 bg-danger-soft border border-danger text-danger font-bold py-2 rounded-md text-sm">
+                        {confirmDelete.kind === 'all' ? '🗑️ Clear All' : '🗑️ Delete'}
+                      </button>
+                    </div>
+                  </div>
+                </Modal>
+              )}
+            </>
+          )}
+        </Modal>
+      );
+    }
+
+    // === SYNC STATUS CARD (on Day Detail) ===
+    function SyncStatusCard({ day, stockMap, onOpenSync, onUndoSync }) {
+      const synced = !!day.stockSync;
+      const trackedItems = (day.activeItems || []).filter(name => stockMap[name]);
+
+      if (synced) {
+        const deductions = day.stockSync.deductions || {};
+        const items = Object.entries(deductions).filter(([_, b]) => b > 0);
+        const totalBoxes = items.reduce((s, [_, b]) => s + b, 0);
+        let when = '';
+        try {
+          const d = new Date(day.stockSync.ts);
+          when = d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        } catch {}
+        const modeLabel = day.stockSync.mode === 'given_out' ? 'Given Out' : day.stockSync.mode === 'pulled' ? 'Pulled' : 'Custom';
+        return (
+          <div className="bg-accent-soft border border-accent rounded-xl p-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base">✅</span>
+                <span className="font-display font-bold text-sm text-1">Synced to Warehouse</span>
+              </div>
+              <span className="text-[10px] text-3 font-data">{when}</span>
+            </div>
+            <div className="text-xs text-2 mb-2">
+              <b className="text-1 font-data">{totalBoxes}</b> {totalBoxes === 1 ? 'box' : 'boxes'} · {items.length} {items.length === 1 ? 'item' : 'items'} · {modeLabel}
+            </div>
+            {items.length > 0 && (
+              <div className="text-[11px] text-3 font-data mb-2 space-y-0.5">
+                {items.map(([name, b]) => (
+                  <div key={name} className="flex justify-between">
+                    <span className="truncate">{name}</span>
+                    <span className="font-bold text-amber shrink-0">−{b} box{b !== 1 ? 'es' : ''}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 mt-2">
+              <button onClick={onOpenSync} className="flex-1 bg-surface border border-line text-2 font-semibold py-1.5 rounded-md text-xs active:scale-[0.98]">
+                🔄 Re-sync
+              </button>
+              <button onClick={onUndoSync} className="flex-1 bg-surface border border-line text-2 font-semibold py-1.5 rounded-md text-xs active:scale-[0.98]">
+                ↩️ Undo
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      if (trackedItems.length === 0) {
+        return (
+          <div className="bg-surface border border-dashed border-line rounded-xl p-3 text-center">
+            <div className="text-xl mb-1">📦</div>
+            <p className="text-xs text-3">No tracked warehouse items on this day.</p>
+            <p className="text-[10px] text-4 mt-1">Add items in <b>Stock</b> setup to sync them here.</p>
+          </div>
+        );
+      }
+      return (
+        <div className="bg-surface border border-line rounded-xl p-3">
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-base">📦</span>
+            <span className="font-display font-bold text-sm text-1">Deduct from Warehouse</span>
+          </div>
+          <p className="text-xs text-3 mb-2">
+            Pull this day's usage from warehouse stock. <b className="text-1">{trackedItems.length}</b> tracked {trackedItems.length === 1 ? 'item' : 'items'} ready.
+          </p>
+          <button onClick={onOpenSync} className="w-full bg-inverse font-bold py-2 rounded-md text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]">
+            📤 Open Sync
+          </button>
+        </div>
+      );
+    }
+
+    function SyncHelpModal({ onClose }) {
+      return (
+        <Modal onClose={onClose}>
+          <div className="text-center mb-3">
+            <div className="text-4xl mb-1">📦</div>
+            <h2 className="font-display text-xl font-extrabold text-1">How Sync Works</h2>
+            <p className="text-3 text-xs mt-1">Plain-English breakdown 🤓</p>
+          </div>
+          <div className="space-y-3 text-xs text-2 max-h-[60vh] overflow-y-auto -mx-1 px-1">
+            <div>
+              <p>Sync subtracts <b className="text-1">full boxes</b> from your warehouse based on what you used today. There are 3 ways it can calculate.</p>
+            </div>
+
+            <div className="bg-surface-2 border border-line rounded-lg p-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-base">📤</span>
+                <b className="text-1">Given Out</b>
+                <span className="text-[10px] text-4">— leftovers come back to warehouse</span>
+              </div>
+              <p className="text-[11px] text-3 mb-1.5">Math: <code className="font-data text-1">Starting + Restocks − Leftover</code></p>
+              <div className="bg-surface rounded-md p-2 text-[11px] font-data">
+                <div className="text-3 mb-1">📚 Example: 1 box = 250 bags</div>
+                <div>Started: <b className="text-1">250</b></div>
+                <div>Restocked: <b className="text-1">+20</b></div>
+                <div>Leftover: <b className="text-1">−19</b></div>
+                <div className="text-amber font-bold mt-1">Gave out: 251 → deduct 1 box ✓</div>
+              </div>
+            </div>
+
+            <div className="bg-surface-2 border border-line rounded-lg p-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-base">📥</span>
+                <b className="text-1">Pulled</b>
+                <span className="text-[10px] text-4">— leftovers stay at venue</span>
+              </div>
+              <p className="text-[11px] text-3 mb-1.5">Math: <code className="font-data text-1">Starting + Restocks</code> (ignores leftover)</p>
+              <div className="bg-surface rounded-md p-2 text-[11px] font-data">
+                <div className="text-3 mb-1">📚 Same example, but leftover doesn't return</div>
+                <div>Started: <b className="text-1">250</b></div>
+                <div>Restocked: <b className="text-1">+20</b></div>
+                <div className="text-amber font-bold mt-1">Pulled total: 270 → deduct 1 box ✓</div>
+                <div className="text-[10px] text-4 mt-1">(everything you took from warehouse is "gone")</div>
+              </div>
+            </div>
+
+            <div className="bg-surface-2 border border-line rounded-lg p-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-base">✏️</span>
+                <b className="text-1">Custom</b>
+                <span className="text-[10px] text-4">— you decide</span>
+              </div>
+              <p className="text-[11px] text-3">For weird scenarios where neither auto-math fits. Just type the number of boxes to subtract.</p>
+            </div>
+
+            <div className="bg-accent-soft border border-accent rounded-lg p-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-base">🎯</span>
+                <b className="text-1">Round-Down Rule</b>
+              </div>
+              <p className="text-[11px] text-2 mb-1">Only <b>full boxes</b> get deducted. A box you've opened but not finished stays at the warehouse as 1 box (an "open" box).</p>
+              <p className="text-[11px] text-3">Example: gave out 100 from a 250-pack → 0 boxes deducted (the box is still in use). Once you fully drain that box, the next sync deducts it.</p>
+            </div>
+
+            <div className="text-[11px] text-3">
+              <b className="text-1">💡 Tip:</b> Set realistic <b>units per box</b> in each item's ⚙️ Setup. If your real boxes hold 50 shirts, set 50/box — not 250. That makes auto-math line up with reality.
+            </div>
+          </div>
+          <button onClick={onClose} className="w-full mt-3 bg-inverse font-bold py-2.5 rounded-md text-sm">Got it 👍</button>
+        </Modal>
+      );
+    }
+
+    function SyncToWarehouseModal({ day, itemsLibrary, stockMap, onClose, onApply }) {
+      const trackedItems = (day.activeItems || []).filter(name => stockMap[name]);
+      const untrackedItems = (day.activeItems || []).filter(name => !stockMap[name]);
+
+      const buildInitial = (m) => {
+        const result = {};
+        for (const name of trackedItems) {
+          const stock = stockMap[name];
+          result[name] = calcSuggestedDeduction(day.inventory[name], stock.unitsPerBox || 1, m);
+        }
+        return result;
+      };
+
+      const [mode, setMode] = useState(day.stockSync?.mode || 'given_out');
+      const [deductions, setDeductions] = useState(() => buildInitial(day.stockSync?.mode || 'given_out'));
+      const [showHelp, setShowHelp] = useState(false);
+
+      const switchMode = (m) => {
+        setMode(m);
+        setDeductions(buildInitial(m));
+      };
+      const updateDed = (name, val) => {
+        const num = Math.max(0, parseInt(val) || 0);
+        setDeductions(d => ({ ...d, [name]: num }));
+      };
+      const bump = (name, delta) => {
+        const cur = deductions[name] || 0;
+        updateDed(name, cur + delta);
+      };
+
+      const totalBoxes = Object.values(deductions).reduce((s, b) => s + (b || 0), 0);
+      const isCustom = mode === 'custom';
+
+      const MODE_OPTIONS = [
+        { id: 'given_out', label: 'Given Out', emoji: '📤' },
+        { id: 'pulled', label: 'Pulled', emoji: '📥' },
+        { id: 'custom', label: 'Custom', emoji: '✏️' },
+      ];
+
+      if (showHelp) {
+        return <SyncHelpModal onClose={() => setShowHelp(false)} />;
+      }
+
+      return (
+        <Modal onClose={onClose}>
+          <div className="flex items-start justify-between gap-2 mb-0.5">
+            <h3 className="font-display text-lg font-bold text-1">📦 Sync to Warehouse</h3>
+            <button onClick={() => setShowHelp(true)} className="shrink-0 w-7 h-7 rounded-md bg-surface-2 border border-line text-3 active:scale-95 flex items-center justify-center text-xs font-bold" aria-label="How does this work?">
+              ⓘ
+            </button>
+          </div>
+          <p className="text-xs text-3 mb-3 font-data">Day {day.dayNum} · {dateNice(day.date)}</p>
+
+          <div className="mb-3">
+            <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-1.5">Calculate based on</div>
+            <div className="flex gap-1 bg-surface-2 border border-line rounded-lg p-1">
+              {MODE_OPTIONS.map(opt => (
+                <button key={opt.id} onClick={() => switchMode(opt.id)} className={`flex-1 py-1.5 rounded-md text-[11px] font-display font-bold transition ${mode === opt.id ? 'bg-accent-soft text-1 border border-accent' : 'text-3 border border-transparent'}`}>
+                  {opt.emoji} {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-4 font-data mt-1.5 px-1">
+              {mode === 'given_out' && '🤖 Auto: Starting + Restocks − Leftover, rounded down to full boxes'}
+              {mode === 'pulled' && '🤖 Auto: Starting + Restocks (everything you took), rounded down to full boxes'}
+              {mode === 'custom' && '✏️ Manual entry — adjust each item below'}
+            </p>
+          </div>
+
+          <div className="max-h-[40vh] overflow-y-auto -mx-1 px-1 space-y-1.5 mb-3">
+            {trackedItems.length === 0 ? (
+              <div className="text-center py-6 text-3 text-xs">
+                <div className="text-2xl mb-2">📦</div>
+                <p>No tracked items on this day.</p>
+              </div>
+            ) : trackedItems.map(name => {
+              const inv = day.inventory[name] || {};
+              const stock = stockMap[name];
+              const upb = stock.unitsPerBox || 1;
+              const starting = inv.starting || 0;
+              const restocks = (inv.restocks || []).reduce((s, r) => s + (r.amount || 0), 0);
+              const leftover = inv.leftover;
+              const givenOut = (leftover === null || leftover === undefined) ? null : Math.max(0, starting + restocks - leftover);
+              const pulled = starting + restocks;
+              const emoji = getEmoji(itemsLibrary, name);
+              const dedVal = deductions[name] || 0;
+              const dedUnits = dedVal * upb;
+              const afterBoxes = Math.max(0, stock.boxes - dedVal);
+              const noChange = dedVal === 0;
+
+              return (
+                <div key={name} className="bg-surface-2 border border-line rounded-lg p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-base shrink-0">{emoji}</span>
+                      <span className="font-display font-bold text-sm text-1 truncate">{name}</span>
+                    </div>
+                    <div className="text-[10px] text-4 font-data shrink-0">
+                      📦 {stock.boxes} on hand
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-3 font-data mb-2 leading-snug">
+                    {mode === 'given_out' && (
+                      <>Start <b className="text-1">{starting}</b> + Restocks <b className="text-1">{restocks}</b> − Left <b className="text-1">{leftover ?? '—'}</b> = Given <b className="text-amber">{givenOut ?? '—'}</b> · {upb}/box</>
+                    )}
+                    {mode === 'pulled' && (
+                      <>Start <b className="text-1">{starting}</b> + Restocks <b className="text-1">{restocks}</b> = Pulled <b className="text-amber">{pulled}</b> · {upb}/box</>
+                    )}
+                    {mode === 'custom' && (
+                      <>Reference: Given <b className="text-1">{givenOut ?? '—'}</b> · Pulled <b className="text-1">{pulled}</b> · {upb}/box</>
+                    )}
+                  </div>
+
+                  {isCustom ? (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] text-3 font-data shrink-0 uppercase tracking-widest font-bold">Deduct</span>
+                      <button onClick={() => bump(name, -1)} className="w-7 h-7 bg-surface border border-line rounded-md font-bold text-1 active:scale-95">−</button>
+                      <input type="number" inputMode="numeric" value={dedVal} onChange={e => updateDed(name, e.target.value)} onFocus={e => e.target.select()} className="input flex-1 text-center px-2 py-1 rounded-md text-base font-data font-bold w-12" />
+                      <button onClick={() => bump(name, 1)} className="w-7 h-7 bg-surface border border-line rounded-md font-bold text-1 active:scale-95">+</button>
+                      <span className="text-[10px] text-4 font-data shrink-0">
+                        box{dedVal === 1 ? '' : 'es'} <span className="text-amber">({dedUnits} u)</span>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-surface rounded-md px-2 py-1.5 border border-line">
+                      <span className="text-[10px] uppercase tracking-widest font-data font-bold text-3">🤖 Auto-deduct</span>
+                      <div className="text-right">
+                        <span className="font-data font-extrabold text-amber text-sm">
+                          {dedVal} {dedVal === 1 ? 'box' : 'boxes'}
+                        </span>
+                        {dedUnits > 0 && <span className="font-data text-[10px] text-3 ml-1">({dedUnits} u)</span>}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={`text-[10px] font-data mt-1.5 flex items-center gap-1 ${noChange ? 'text-4' : 'text-2'}`}>
+                    <span className="uppercase tracking-widest font-bold">Warehouse:</span>
+                    <span className="font-bold text-1 tabular-nums">{stock.boxes}</span>
+                    <span className="text-5">→</span>
+                    <span className={`font-extrabold tabular-nums ${noChange ? 'text-3' : 'text-accent'}`}>{afterBoxes}</span>
+                    <span>boxes</span>
+                    {noChange && <span className="text-4 ml-1">(no change)</span>}
+                  </div>
+                </div>
+              );
+            })}
+            {untrackedItems.length > 0 && (
+              <div className="bg-surface border border-dashed border-line rounded-lg p-2.5">
+                <div className="text-[10px] text-3 font-data font-bold uppercase tracking-widest mb-1">⊘ Not in warehouse</div>
+                <div className="text-[11px] text-3 font-data">{untrackedItems.join(', ')}</div>
+                <p className="text-[10px] text-4 mt-1">Add to Stock setup to track here.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between mb-2 px-1 py-2 bg-surface-2 rounded-md border border-line">
+            <span className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Total Deduction</span>
+            <span className="font-data font-extrabold text-lg text-amber">{totalBoxes} {totalBoxes === 1 ? 'box' : 'boxes'}</span>
+          </div>
+
+          {totalBoxes === 0 && !isCustom && (
+            <div className="bg-surface border border-line rounded-md p-2 mb-2 text-[11px] text-3">
+              ℹ️ Nothing to deduct yet.
+              {mode === 'given_out' && trackedItems.some(n => day.inventory[n]?.leftover == null) && ' Some items missing leftover counts. '}
+              {mode === 'given_out' && !trackedItems.some(n => day.inventory[n]?.leftover == null) && ' Round-down means only full boxes count. '}
+              {mode === 'pulled' && ' No units pulled (starting + restocks = 0). '}
+              Try <button onClick={() => switchMode('custom')} className="underline font-bold text-accent">Custom</button> to deduct manually.
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <button onClick={onClose} className="flex-1 bg-surface-2 border border-line text-2 font-semibold py-2 rounded-md text-sm">Cancel</button>
+            <button onClick={() => onApply(mode, deductions)} disabled={totalBoxes === 0} className="flex-1 bg-inverse font-bold py-2 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              📤 Apply Sync
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    function TourNameSection({ tourName, onSave }) {
+      const [draft, setDraft] = useState(tourName || '');
+      useEffect(() => { setDraft(tourName || ''); }, [tourName]);
+      const trimmed = draft.trim();
+      const current = (tourName || '').trim();
+      const hasChange = trimmed !== current;
+      const save = () => { if (hasChange) onSave(trimmed); };
+      const isClear = current && !trimmed;
+      return (
+        <div className="bg-surface border border-line rounded-xl p-3 mb-4">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-base">🏷️</span>
+              <label className="text-[10px] uppercase tracking-widest text-2 font-data font-bold">Tour / Event Name</label>
+            </div>
+            {current && !hasChange && (
+              <span className="text-[9px] font-data uppercase tracking-widest text-accent font-bold flex items-center gap-0.5">
+                <Check className="w-2.5 h-2.5" strokeWidth={4} /> Saved
+              </span>
+            )}
+          </div>
+          <div className="flex gap-1.5">
+            <input
+              value={draft}
+              onChange={e => setDraft(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && save()}
+              placeholder="e.g. Spring 2026 College Tour"
+              className="input flex-1 rounded-md px-3 py-2 text-sm placeholder-mute"
+              maxLength={80}
+            />
+            <button
+              onClick={save}
+              disabled={!hasChange}
+              className={`px-3 rounded-md font-bold text-xs active:scale-95 disabled:opacity-40 flex items-center gap-1 ${isClear ? 'bg-danger-soft border border-danger text-danger' : 'bg-accent text-inverse'}`}
+            >
+              {isClear ? '🗑️ Clear' : <><Plus className="w-3 h-3" strokeWidth={3} /> Save</>}
+            </button>
+          </div>
+          <p className="text-[10px] text-3 font-data mt-1.5">Shows under "Premium." on Home, in exports, and the end-of-tour summary.</p>
+        </div>
+      );
+    }
+
+    function Library({ items, onChange, tourName, onTourNameChange, onBack, onEndTour, onInfo, showToast, hasData, onExport, onImport, events, daysIndex }) {
       const [newItem, setNewItem] = useState('');
       const [editing, setEditing] = useState(null);
       const [confirming, setConfirming] = useState(null);
       const [pendingImport, setPendingImport] = useState(null);
+      const [exportChooser, setExportChooser] = useState(false);
+      const [selectedExportIds, setSelectedExportIds] = useState(() => new Set());
       const fileRef = useRef(null);
 
-      const handleExport = async () => {
+      const sanitize = (s) => (s || 'export').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'export';
+
+      const openExportChooser = () => { setSelectedExportIds(new Set()); setExportChooser(true); };
+      const closeExportChooser = () => { setExportChooser(false); setSelectedExportIds(new Set()); };
+
+      const toggleExportSelected = (id) => {
+        setSelectedExportIds(prev => {
+          const next = new Set(prev);
+          if (next.has(id)) next.delete(id); else next.add(id);
+          return next;
+        });
+      };
+
+      const handleExport = async (eventIds) => {
         try {
-          const data = await onExport();
+          const data = await onExport(eventIds);
           const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
           const stamp = new Date().toISOString().split('T')[0];
-          a.download = `premium-backup-${stamp}.json`;
+          let tag = '';
+          let toastMsg = '📥 Full backup downloaded';
+          if (eventIds && eventIds.length === 1) {
+            const ev = events?.find(e => e.id === eventIds[0]);
+            if (ev) { tag = `-${sanitize(ev.name)}`; toastMsg = `📥 Exported "${ev.name}"`; }
+          } else if (eventIds && eventIds.length > 1) {
+            tag = `-${eventIds.length}-events`;
+            toastMsg = `📥 Exported ${eventIds.length} events`;
+          }
+          a.download = `premium-backup${tag}-${stamp}.json`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showToast('📥 Backup downloaded');
+          showToast(toastMsg);
         } catch { showToast('❌ Export failed'); }
+        closeExportChooser();
       };
 
       const handleImportClick = () => fileRef.current?.click();
@@ -1392,6 +2781,9 @@
             <p className="text-3 text-xs mt-1.5">Items you can pick from when starting a day. Add or edit anytime.</p>
           </div>
 
+          {/* Tour Name */}
+          <TourNameSection tourName={tourName} onSave={(name) => { onTourNameChange(name); showToast(name ? '🏷️ Tour name saved' : '🏷️ Tour name cleared'); }} />
+
           <div className="bg-surface border border-line rounded-lg p-2 flex gap-1.5 mb-3">
             <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === 'Enter' && addItem()} placeholder="New item (Stickers, Hats, etc.)" className="input flex-1 rounded-md px-2.5 py-1.5 text-sm placeholder-mute" />
             <button onClick={addItem} disabled={!newItem.trim()} className="px-3 bg-accent rounded-md font-bold text-xs active:scale-95 disabled:opacity-40 flex items-center gap-0.5"><Plus className="w-3 h-3" strokeWidth={3} /> Add</button>
@@ -1424,11 +2816,11 @@
             <div className="mt-8">
               <div className="text-[10px] font-data uppercase tracking-[0.25em] text-3 font-bold mb-2 px-1">Backup &amp; Sync</div>
               <div className="bg-surface border border-line rounded-xl p-3 space-y-2">
-                <button onClick={handleExport} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
+                <button onClick={openExportChooser} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
                   <span className="text-xl">📥</span>
                   <div className="flex-1 min-w-0">
                     <div className="font-display font-bold text-sm text-1">Export Data</div>
-                    <div className="text-[11px] text-3 font-data">Download a .json backup of everything</div>
+                    <div className="text-[11px] text-3 font-data">Download a .json backup of everything or one event</div>
                   </div>
                 </button>
                 <button onClick={handleImportClick} className="w-full bg-surface-2 border border-line rounded-lg px-3 py-2.5 flex items-center gap-2 active:scale-[0.99] text-left">
@@ -1500,6 +2892,66 @@
               </div>
             </Modal>
           )}
+
+          {exportChooser && (
+            <Modal onClose={closeExportChooser}>
+              <h3 className="font-display text-lg font-bold mb-1 text-1">📥 Export Data</h3>
+              <p className="text-xs text-3 mb-3 font-data">
+                Tap <b className="text-1">Everything</b> for a full backup,
+                or check one or more events below, then tap <b className="text-accent">Download</b>.
+              </p>
+              <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+                <button onClick={() => handleExport(null)} className="w-full bg-accent-soft border border-accent rounded-lg p-3 text-left active:scale-[0.99]">
+                  <div className="font-display font-extrabold text-sm text-1">📦 Everything</div>
+                  <div className="text-[11px] text-2 mt-0.5">All {events?.length || 0} event{(events?.length || 0) !== 1 ? 's' : ''} · {daysIndex?.length || 0} day{(daysIndex?.length || 0) !== 1 ? 's' : ''} · full item library</div>
+                </button>
+                {(events?.length || 0) > 0 && (
+                  <div className="text-[9px] uppercase tracking-widest text-4 font-data font-bold pt-2 pb-1 px-1">Pick Events to Bundle</div>
+                )}
+                {(events || []).map(ev => {
+                  const evDays = (daysIndex || []).filter(d => d.eventId === ev.id);
+                  const selected = selectedExportIds.has(ev.id);
+                  return (
+                    <button
+                      key={ev.id}
+                      onClick={() => toggleExportSelected(ev.id)}
+                      className={`w-full rounded-lg p-3 text-left active:scale-[0.99] border ${selected ? 'bg-accent-soft border-accent' : 'bg-surface-2 border-line'}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`w-5 h-5 rounded shrink-0 flex items-center justify-center border-2 ${selected ? 'bg-accent border-accent' : 'border-line'}`}>
+                          {selected && <Check className="w-3 h-3 text-inverse" strokeWidth={4} />}
+                        </span>
+                        <span className="text-lg shrink-0">{eventEmoji(ev)}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-display font-extrabold text-sm text-1 truncate">{ev.name}</div>
+                          <div className="text-[11px] text-3 font-data">
+                            {evDays.length} day{evDays.length !== 1 ? 's' : ''}
+                            {ev.city && ` · ${ev.city}`}
+                            {ev.monthYear && ` · ${monthYearShort(ev.monthYear)}`}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 pt-3 border-t border-line space-y-2">
+                <button
+                  onClick={() => handleExport([...selectedExportIds])}
+                  disabled={selectedExportIds.size === 0}
+                  className={`w-full font-bold py-2.5 rounded-lg flex items-center justify-center gap-1.5 active:scale-[0.98] transition ${selectedExportIds.size === 0 ? 'bg-surface-2 text-4 border border-line cursor-not-allowed' : 'bg-inverse'}`}
+                >
+                  <span>📥</span>
+                  <span className="font-display text-sm">
+                    {selectedExportIds.size === 0 ? 'Pick events to download' : `Download ${selectedExportIds.size} selected`}
+                  </span>
+                </button>
+                <button onClick={closeExportChooser} className="w-full bg-surface-2 border border-line rounded-lg p-2 text-left active:scale-[0.99]">
+                  <div className="font-display font-extrabold text-sm text-2 text-center">❌ Cancel</div>
+                </button>
+              </div>
+            </Modal>
+          )}
         </div>
       );
     }
@@ -1538,7 +2990,7 @@
     }
 
     // === TOUR SUMMARY ===
-    function TourSummary({ events, daysIndex, itemsLibrary, theme, onBack, onStartNewTour, onInfo, showToast }) {
+    function TourSummary({ events, daysIndex, itemsLibrary, tourName, theme, onBack, onStartNewTour, onInfo, showToast }) {
       const [stats, setStats] = useState(null);
       const [funFact, setFunFact] = useState(null);
       const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -1609,6 +3061,7 @@
         if (!stats) return;
         const lines = [];
         lines.push(`🏆 TOUR COMPLETE`);
+        if (tourName) lines.push(`🏷️ ${tourName}`);
         lines.push(`━━━━━━━━━━━━━━━━━`);
         if (stats.firstDate && stats.lastDate) lines.push(`${dateShort(stats.firstDate)} → ${dateShort(stats.lastDate)}`);
         lines.push(``);
@@ -1664,6 +3117,12 @@
             <div className="text-center mb-4">
               <div className="text-5xl mb-2">🏆</div>
               <h1 className="font-display text-3xl font-extrabold text-1 leading-tight">Tour Complete!</h1>
+              {tourName && (
+                <div className="font-display font-extrabold text-base text-accent mt-1.5 flex items-center justify-center gap-1.5">
+                  <span>🏷️</span>
+                  <span>{tourName}</span>
+                </div>
+              )}
               {stats.firstDate && stats.lastDate && (
                 <p className="text-xs text-3 font-data mt-1">
                   {dateShort(stats.firstDate)} → {dateShort(stats.lastDate)}
@@ -1672,10 +3131,10 @@
             </div>
 
             {/* Hero number */}
-            <div className="bg-surface border border-line rounded-xl p-4 mb-3 text-center">
-              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold">Total Given Out</div>
-              <div className="font-display font-extrabold text-5xl text-amber leading-none mt-1">{stats.totalGivenOut.toLocaleString()}</div>
-              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mt-1">items</div>
+            <div className="bg-surface border border-line rounded-xl p-5 mb-3 text-center">
+              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-2">Total Given Out</div>
+              <div className="font-display font-extrabold text-5xl text-amber" style={{ lineHeight: 1.1, paddingTop: '4px', paddingBottom: '4px' }}>{stats.totalGivenOut.toLocaleString()}</div>
+              <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mt-2">items</div>
             </div>
 
             {/* Stats row */}
@@ -1689,17 +3148,17 @@
             {stats.itemRows.length > 0 && (
               <div className="bg-surface border border-line rounded-xl p-3 mb-3">
                 <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-2">📊 By Item</div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {stats.itemRows.map(([name, val]) => (
-                    <div key={name} className="flex items-center gap-2">
-                      <div className="text-xs flex items-center gap-1 w-28 shrink-0">
-                        <span>{getEmoji(itemsLibrary, name)}</span>
-                        <span className="truncate text-1 font-semibold">{name}</span>
+                    <div key={name} className="flex items-center gap-2" style={{ minHeight: '28px' }}>
+                      <div className="text-xs flex items-center gap-1 shrink-0" style={{ width: '120px', lineHeight: '1.4' }}>
+                        <span className="shrink-0" style={{ fontSize: '14px' }}>{getEmoji(itemsLibrary, name)}</span>
+                        <span className="text-1 font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '95px' }}>{name}</span>
                       </div>
-                      <div className="flex-1 h-5 bg-surface-2 rounded overflow-hidden relative">
-                        <div className="absolute inset-y-0 left-0 bg-accent" style={{ width: `${(val / stats.maxItem) * 100}%` }}></div>
+                      <div className="flex-1 bg-surface-2 rounded relative" style={{ height: '20px' }}>
+                        <div className="absolute bg-accent rounded" style={{ top: 0, left: 0, bottom: 0, width: `${(val / stats.maxItem) * 100}%` }}></div>
                       </div>
-                      <div className="font-data font-bold text-xs text-1 w-12 text-right">{val.toLocaleString()}</div>
+                      <div className="font-data font-bold text-xs text-1 text-right shrink-0" style={{ width: '52px', lineHeight: '1.4' }}>{val.toLocaleString()}</div>
                     </div>
                   ))}
                 </div>
@@ -1709,10 +3168,10 @@
             {/* Cities */}
             {stats.cityList.length > 0 && (
               <div className="bg-surface border border-line rounded-xl p-3 mb-3">
-                <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-1.5">📍 Cities Visited</div>
+                <div className="text-[10px] uppercase tracking-widest text-3 font-data font-bold mb-2">📍 Cities Visited</div>
                 <div className="flex flex-wrap gap-1.5">
                   {stats.cityList.map(c => (
-                    <span key={c} className="text-xs font-semibold bg-surface-2 border border-line rounded-full px-2 py-0.5 text-1">{c}</span>
+                    <span key={c} className="text-xs font-semibold bg-surface-2 border border-line rounded-full text-1" style={{ padding: '4px 12px', lineHeight: '1.4', display: 'inline-block' }}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -1771,8 +3230,8 @@
     function StatBox({ emoji, label, value }) {
       return (
         <div className="bg-surface border border-line rounded-xl p-3 text-center">
-          <div className="text-xl mb-0.5">{emoji}</div>
-          <div className="font-data font-extrabold text-xl text-1 leading-none">{value}</div>
+          <div className="text-xl mb-0.5" style={{ lineHeight: '1.2' }}>{emoji}</div>
+          <div className="font-data font-extrabold text-xl text-1" style={{ lineHeight: '1.2' }}>{value}</div>
           <div className="text-[9px] uppercase tracking-widest text-3 font-data font-bold mt-1">{label}</div>
         </div>
       );
